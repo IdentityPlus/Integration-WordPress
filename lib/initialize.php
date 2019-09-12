@@ -121,7 +121,6 @@ function identity_plus_initialize(){
 	
 			// If Identity + Profile Exists
 			error_log("...........dx.............. " . $_SESSION['identity-plus-user-id']);
-			error_log("......................... " . var_dump($_SESSION['identity-plus-user-profile']));
 			if(isset($_SESSION['identity-plus-user-profile'])) $identity_plus_api = identity_plus_autologin($options, $identity_plus_api);
 
             // see if we triggered a bind event

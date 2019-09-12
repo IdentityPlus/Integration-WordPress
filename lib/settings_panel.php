@@ -36,10 +36,6 @@ function identity_plus_settings_init(  ) {
 		if(!$problems){
 			register_setting( 'identity_plus_cert_section', 'identity_plus_settings' , 'identity_plus_handle_file_upload');
 
-			add_settings_section('identity_plus_identity_plus_cert_section_section', __( 'API Certificate', 'identity_plus' ), 'identity_plus_api_section_callback', 'identity_plus_cert_section');
-			add_settings_field('cert-file', __( 'Certificate File', 'identity_plus' ),	'identity_plus_cert_file_render', 'identity_plus_cert_section', 'identity_plus_identity_plus_cert_section_section');
-			add_settings_field('cert-password', __( 'Certificate Password', 'identity_plus' ), 'identity_plus_cert_password_render', 'identity_plus_cert_section',	'identity_plus_identity_plus_cert_section_section' );
-				
 			add_settings_section('identity_plus_access_section',	__( 'Resource Access', 'identity_plus' ), 'identity_plus_settings_section_callback', 'identity_plus_cert_section');
 			add_settings_field('enforce', __( 'Filtered Page Access', 'identity_plus' ), 'identity_plus_enforce_render', 'identity_plus_cert_section', 'identity_plus_access_section');
 	#		add_settings_field('lock-down', __( 'Lock Down Filtered Pages', 'identity_plus' ), 'identity_plus_lock_down_render', 'identity_plus_cert_section', 'identity_plus_access_section');
@@ -54,14 +50,14 @@ function identity_plus_settings_init(  ) {
 
 
 function identity_plus_cert_file_render( ) {
-		?><input type="file" name="identity-plus-api-cert-file" /><?php
+		?><input type="file" style="margin-top:5px;" name="identity-plus-api-cert-file" /><?php
 }
 
 
 
 function identity_plus_cert_password_render(  ) { 
 		$options = get_option( 'identity_plus_settings' ); ?>
-		<input type='text' name='identity_plus_settings[cert-password]' style="width:350px;" placeholder="Type/Paste Certificate Password" value='<?php echo isset($options['cert-password']) ? $options['cert-password'] : ""; ?>'><?php
+		<input type='text' name='identity_plus_settings[cert-password]' style="width:350px; margin-bottom:10px; margin-top:5px;" placeholder="Type/Paste Certificate Password" value='<?php echo isset($options['cert-password']) ? $options['cert-password'] : ""; ?>'><?php
 }
 
 
@@ -110,34 +106,6 @@ function identity_plus_not_section_callback(  ) {
 }
 
 
-
-function identity_plus_api_section_callback(  ) {
-		?><p class="identity-plus-separator" style="padding-top:5px;"></p><p class="identity-plus-hint">With Identity + all communication is encrypted, even redirects. We don't use tokens, we use public key criptography for authentication.</p>
-		<div class="cert"><h4>Certificate Details</h4><?php 
-		$options = get_option( 'identity_plus_settings' );
-		if(!empty($options) && isset($options['cert-data'])){
-				$cs = array();
-				if(openssl_pkcs12_read (base64_decode($options['cert-data']), $cs , isset($options['cert-password']) ? $options['cert-password'] : '')){
-						$cert_details = openssl_x509_parse($cs['cert']);
-						$now = time();
-						$your_date = strtotime(wp_get_current_user()->user_registered);
-						$days = floor(abs($cert_details['validTo_time_t'] - $now) / 86400);
-						?>
-						<p><span>Serial No: </span><?php echo strtoupper(dechex($cert_details['serialNumber'])) ?></p>
-						<p><span>Subject: </span><?php echo substr(str_replace("/", ", ", $cert_details['name']), 2) ?></p>
-						<p><span>Valid Until: </span><?php echo date(DATE_RFC2822, $cert_details['validTo_time_t']) ?></p> 
-						<p><span>Expires In: </span><?php echo  $days?> days</p>
-						<?php 
-				}
-				else{
-						?><p>API certificate cannot be read.</p><?php 
-				}
-		}
-		?><p style="margin:10px 0 0 0; float:left; clear:both; font-size:80%; max-width:550px; color:#808080;"><a target="_blank" href="https://my.identity.plus"><?php echo !isset($options['cert-data']) ? "Get A Certificate" : "Renew Certificate"; ?></a></p></div><?php
-}
-
-
-
 function identity_plus_settings_section_callback(  ) { 
 		?><p class="identity-plus-separator" style="padding-top:5px;"></p><p class="identity-plus-hint">You can restrict access to critical sections of your site to authorized devices only</p><?php 
 }
@@ -147,29 +115,109 @@ function identity_plus_settings_section_callback(  ) {
 function identity_plus_admin_styles(  ) {
 		?>
 		<style>
+				.identity-plus-main-fm{ float:left; overflow:hidden; clear:left;}
 				.identity-plus-main-fm-header {margin:0; background:url('<?php echo plugins_url( 'img/idp.svg', __FILE__ ) ?>') no-repeat top left; background-size:64px;}
 				.identity-plus-main-fm-header h1{padding-left:80px; padding-top:10px; margin-bottom:0; font-size:36px;font-weight:normal; }
 				.identity-plus-main-fm-header h5{padding-left:80px; font-size:20px; font-weight:300; padding-bottom:5px; padding-top:0; margin-top:15px;}
 
+				.identity-plus-main-fm p{margin:0;}
 				.identity-plus-main-fm th{padding-bottom:15px; padding-top:15px; color:#136a92;}
 				.identity-plus-main-fm td{padding-bottom:10px; padding-top:10px; }
-				.identity-plus-main-fm h2, .identity-plus-main-fm h3{border-bottom:0; background:#303030; float:left; clear:left; padding:5px 20px; margin-bottom:0px; color:#62B2F3; font-weight:normal; border-top-left-radius:5px; border-top-right-radius:5px; margin-left:10px;}
-				.identity-plus-main-fm h4{border-bottom:1px solid #E0E0E0; color:#707070; padding-bottom:3px; padding-top:10px; margin-bottom:5px; font-weight:normal; font-size:16px;padding-top:0; margin-top:0; }
+				.identity-plus-main-fm h2, .identity-plus-main-fm h3{border:1px solid rgba(0,0,0,0.1); border-bottom:0; background:#FFFFFF; float:left; clear:left; padding:8px 20px; margin-bottom:0px; color:#3282C3; font-weight:normal; border-top-left-radius:5px; border-top-right-radius:5px; margin-left:10px;}
+				.identity-plus-main-fm h4{border-bottom:1px solid #E0E0E0; color:#707070; padding-bottom:3px; padding-top:15px; margin-bottom:5px; font-weight:normal; font-size:16px;padding-top:0; margin-top:0; }
 				.identity-plus-main-fm .cert {max-width:600px; border-radius:3px; float:left; clear:both;}
 				.identity-plus-main-fm .cert p span{font-weight:bold;}
 				.identity-plus-main-fm .cert p{margin:0px; float:left; clear:left;}
 				.identity-plus-main-fm .cert {padding:10px; background:rgba(255, 255, 255, 0.6); border:1px solid rgba(0, 0, 0, 0.3);}
-				.identity-plus-separator{border-top:1px solid #303030; margin-top:0px; float:left; width:90%; clear:both; height:5px; margin-bottom:0px;}
+				.identity-plus-separator{border-top:1px solid #909090; margin-top:0px; float:left; width:100%; clear:both; height:5px; margin-bottom:0px;}
 				.identity-plus-hint{float:left; clear:both; max-width:600px; color:#606060; font-size:14px; margin-top:0px; margin-bottom:10px;}
                 .identity-plus-brand span{color:#4292D3;}
                 .identity-plus-main-fm input, .identity-plus-main-fm textarea{ float:left; clear:left;}
-                .identity-plus-main-fm input[type="checkbox"]{ margin-top:0; margin-right:5px;}
+=                .identity-plus-main-fm input[type="checkbox"]{ margin-top:0; margin-right:5px;}
                 .identity-plus-main-fm label{ float:left; font-weight:400;}
                 .identity-plus-main-fm div{float:left; clear:left; overflow:hidden; margin-bottom:10px;}
                 .identity-plus-main-fm table{max-width:600px; float:left; clear:left;}
                 .identity-plus-main-fm table th img{border-radius:60px; border:3px solid #D0D0D0;}
+				.identity-plus-main-fm a.toggle-off {font-size:16px; color:#202020; padding:5px 0px 5px 0px; margin-right:30px; cursor:pointer;}
+				.identity-plus-main-fm a.toggle-on {font-size:16px; color:#202020;  padding:5px 0px 5px 0px; margin-right:30px; cursor:pointer; border-bottom:1px solid #606060; display:inline-block;}
+				.circular_progress {transform: rotate(90deg);display: inline;}
+				div.holder-more {overflow: hidden;width: 128px;height: 128px;margin-top: 1px;margin-right: 30px;text-align: center;padding-left: 0; display: inline-block; float:left; clear:left; margin-right:30px;}
+				div.holder-more p.overlay {position: relative;width: 100%;line-height: 120%;top: -93px;font-weight: 400; font-size:120%;}
+				div.holder-more p.overlay span {font-weight: 300;font-size: 90%;color: #606060;}
+				#wpfooter{position:static;}
+				.nodisp{display:none;}
 		</style>
 		<?php 
+}
+
+
+function identity_plus_api_section_callback(  ) {
+	?>
+	
+	<div class="identity-plus-main-fm" >
+		<h2>Service Identity</h2>
+		<p class="identity-plus-separator" style="padding-top:5px;"></p><p class="identity-plus-hint">This is the PKI credential your Worpress instance authenticates into Indentity Plus. This is necessary to make sure nobody impersonates your service.</p>
+	</div>
+	<div class="identity-plus-main-fm" >
+	<table class=""><tr><td valign="top">
+	<div class="holder-more"><?php
+		$perimeter = 2*3.14*60;
+		$options = get_option( 'identity_plus_settings' );
+		$dash = 0;
+		$days = 0;
+		if(!empty($options) && isset($options['cert-data'])){
+				$cs = array();
+				if(openssl_pkcs12_read (base64_decode($options['cert-data']), $cs , isset($options['cert-password']) ? $options['cert-password'] : '')){
+						$cert_details = openssl_x509_parse($cs['cert']);
+						$now = time();
+						$your_date = strtotime(wp_get_current_user()->user_registered);
+						$days = floor(abs($cert_details['validTo_time_t'] - $now) / 86400);
+						$all_days = floor(abs($cert_details['validTo_time_t'] - $cert_details['validFrom_time_t']) / 86400);
+						$dash = $perimeter*($days*1.0/$all_days*1.0);
+				}
+		}
+		?><div class="holder-more">
+		<svg width="124.0" height="124.0" viewBox="0 0 124.0 124.0" class="circular_progress">
+			<circle cx="62.0" cy="62.0" r="60.0" fill="none" stroke="#E7E7E7" stroke-width="1.5"></circle>
+			<circle cx="62.0" cy="62.0" r="60.0" fill="none" stroke="#007aD0" stroke-width="1.5" stroke-dasharray="<?php echo $perimeter; ?>" stroke-dashoffset="<?php echo ($perimeter - $dash);?>"></circle>
+		</svg>
+		<p class="overlay"><span><?php echo $days == 0 ? "" : "Expires"; ?><br><?php echo $days == 0 ? "N/A" : date("yy, M, d", $cert_details['validTo_time_t']) ?></span><br><?php echo $days == 0 ? "" : $days . "d"?><span></span></p>
+	</div><?php
+	?><p style="margin:10px 0 0 0; float:left; clear:both; font-size:80%; max-width:550px; color:#808080;"><a target="_blank" href="https://my.identity.plus"><?php echo !isset($options['cert-data']) ? "Get A Certificate" : "Renew Certificate"; ?></a></p></div>
+	</td><td valign="top">
+
+	<div class="identity-plus-main-fm">
+		<script>
+			function toggle_renewal(mode){
+				document.getElementById('renew-fm').className = mode == 0 ? 'identity-plus-hint' : 'nodisp'; 
+				document.getElementById('upload-fm').className = mode == 0 ? 'nodisp' : 'identity-plus-hint';
+				document.getElementById('integrated').className = mode == 0 ? 'toggle-on' : 'toggle-off'; 
+				document.getElementById('manual').className = mode == 0 ? 'toggle-off' : 'toggle-on';
+			}
+		</script>
+		<a id="integrated" class="toggle-on" onclick="toggle_renewal(0)">Automated</a>
+		<a id="manual" class="toggle-off" onclick="toggle_renewal(1);">Manual</a>
+	</div>
+
+	<form id="renew-fm" class="identity-plus-main-fm" action="admin-post.php" method='post' enctype="multipart/form-data">
+			<input type="hidden" name="action" value="autorenew_certificate">
+			<div>
+				<p class="identity-plus-hint" style="font-size:13px; margin-bottom:5px;">To avoid outage, your service identity (certificate) will be renewed automatically in <?php echo ($days - $all_days/3); ?> days.</p>
+				<?php submit_button("Auto-Renew Now"); ?>
+			</div>
+	</form>
+
+	<form id="upload-fm" class="nodisp" action="admin-post.php" method='post' enctype="multipart/form-data">
+			<input type="hidden" name="action" value="upload_certificate">
+			<div>
+				<p class="identity-plus-hint" style="font-size:13px;">Create the service in your <a href="https://my.identity.plus" target="_blank">identityp.plus dashboard</a>, issue the Service Agent Identity and upload it manually.</p>
+				<?php identity_plus_cert_file_render(); ?>
+				<?php identity_plus_cert_password_render(); ?>
+				<?php submit_button("Upload Manually"); ?>
+			</div>
+	</form>
+	</td></tr></table>
+	<?php
 }
 
 
@@ -180,39 +228,17 @@ function identity_plus_options_page(  ) {
 			<h1 class="identity-plus-brand">Identity<span>plus</span></h1>
 			<h5>man &amp; machine</h5>
 		</div>
+		
+		<?php identity_plus_api_section_callback(); ?>
 
-		<div class="identity-plus-main-fm" >
-			<h2>Service Identity</h2>
-			<p class="identity-plus-separator" style="padding-top:5px;"></p><p class="identity-plus-hint">This is the PKI credential your Worpress instance authenticates into Indentity Plus. This is necessary to make sure nobody impersonates your service.</p>
-		</div>
-		<form class="identity-plus-main-fm" action="admin-post.php" method='post' enctype="multipart/form-data">
-				<input type="hidden" name="action" value="upload_certificate">
-				<div>
-					<?php identity_plus_cert_file_render(); ?>
-					<?php identity_plus_cert_password_render(); ?>
-					<p class="identity-plus-hint">You obtained this password when you downloaded the certificate. This password cannot be recovered, if you no longer have it, please re-issue the certificate.</p>
-					<?php submit_button("Upload Manually"); ?>
-				</div>
-		</form>
 		<form class="identity-plus-main-fm" action='options.php' method='post' enctype="multipart/form-data">
 				<?php
 						settings_fields( 'identity_plus_cert_section' );
 						do_settings_sections( 'identity_plus_cert_section' );
-						submit_button();
+						if(!idp_problems(get_option( 'identity_plus_settings' ))) submit_button();
 				?>
 		</form>
 		<?php
-}
-
-
-
-function identity_plus_handle_file_upload($option){
-		if(!empty($_FILES["identity-plus-api-cert-file"]["tmp_name"])){
-			$option['cert-data'] = base64_encode(file_get_contents($_FILES["identity-plus-api-cert-file"]["tmp_name"]));
-			$option['cert-password'] = $_POST["identity_plus_settings"]["cert-password"];
-		}
-	
-		return $option;
 }
 
 
@@ -226,7 +252,11 @@ function identity_plus_enable_extra_extensions($mime_types =array() ) {
 add_action( 'admin_post_upload_certificate', 'identity_plus_admin_upload_certificate');
 function identity_plus_admin_upload_certificate(){
 	$options = get_option( 'identity_plus_settings');
-	$options = identity_plus_handle_file_upload($options);
+
+	if(!empty($_FILES["identity-plus-api-cert-file"]["tmp_name"])){
+		$options['cert-data'] = base64_encode(file_get_contents($_FILES["identity-plus-api-cert-file"]["tmp_name"]));
+		$options['cert-password'] = $_POST["identity_plus_settings"]["cert-password"];
+	}
 
 	update_option( 'identity_plus_settings', $options);
 
@@ -234,6 +264,23 @@ function identity_plus_admin_upload_certificate(){
 	exit;
 	status_header(200);
 	die("Certificate uploaded.");
+}
+
+add_action( 'admin_post_renew_certificate', 'identity_plus_admin_renew_certificate');
+function identity_plus_admin_renew_certificate(){
+	$options = get_option( 'identity_plus_settings');
+
+	if(!empty($_FILES["identity-plus-api-cert-file"]["tmp_name"])){
+		$options['cert-data'] = base64_encode(file_get_contents($_FILES["identity-plus-api-cert-file"]["tmp_name"]));
+		$options['cert-password'] = $_POST["identity_plus_settings"]["cert-password"];
+	}
+
+	update_option( 'identity_plus_settings', $options);
+
+	wp_redirect( $_SERVER["HTTP_REFERER"], 302, 'WordPress' );
+	exit;
+	status_header(200);
+	die("Certificate renewed.");
 }
 
 # -------------------------- Id + Menu Page

@@ -128,15 +128,79 @@ class Redirect_Request extends API_Request{
 		$this->return_url = $return_url;
 		$this->salt = Identity_Plus_Utils::random_text(16);
 	}
+}
 
-	/**
-	 * Empty initializer, it is necessary to initialize to null the public fields.
-	 * The deserializer will override the final modifier and re-initialize the fields
-	 * with the proper values
-	 */
-	public function construct($json){
-		// restore_object(object);
-	}
+/**
+ * The Agent Certificate Renewal request is used to issue certificates for Service Agents (Clients). 
+ * This can happen in two ways,:
+ * either the request is made for a valid previous certificate, in which a renewal procedure is executed,
+ * or it needs to be performed with an initial secret and then an issuing is performed.
+ * A service agent can rewnew its own certificate this way, but care must be taken as the previous certificate will be 
+ * revoked uppon issuing the new one.
+ * 
+ * @author Stefan Harsan Farr
+ */
+class Service_Agent_Identity_Request extends API_Request{
+
+    /**
+     * Name of the agent to issue certificate for.
+     * If the name exists, it will renew, otherwise it will create a new agent
+     */
+    public $agent_name;
+    
+    /**
+     * Domain Name of the service where the agent should be issued.
+     * 
+     * By default (if the domain is not specified), the agent will be created/renewed within the service
+     * to which the calling agent (the one whose certificate is used to make this call) belongs to.
+     * 
+     * If the target service is specified, then the calling service (the service to which the calling agent belongs to)
+     * must have administrative rights in target service. Otherwise this operation will fail 
+     */
+    public $service_domain;
+    
+    public function __construct($service_domain, $agent_name){
+            $this->service_domain = $service_domain;
+            $this->agent_name = $agent_name;
+    }
+}
+
+/**
+ * The core response for most request containing a reference number
+ * It comes in response to a call that requires a reference number such as an intrusion report
+ * 
+ * @author Stefan Harsan Farr
+ */
+class Service_Agent_Identity extends API_Response{
+   
+    /**
+     * p12 certificate format
+     */
+    public $p12;
+
+    /**
+     * Password for the p12 format
+     */
+    public $password;
+
+    /**
+     * PEM encoded certificate
+     */
+    public $certificate;
+    
+    /**
+     * PEM encoded private key
+     */
+    public $private_key;
+    
+    
+	public function __construct($data){
+		parent::__construct($data);
+		$this->p12 = $data->{'p12'};
+        $this->password = $data->{'password'};
+        $this->certificate = $data->{'certificate'};
+        $this->private_key = $data->{'private_key'};
+    }
 }
 
 /**
