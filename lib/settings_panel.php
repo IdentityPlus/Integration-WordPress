@@ -6,6 +6,7 @@ if (!defined('Identity +')){
 }
 
 use identity_plus\api\communication\Intent_Type;
+use identity_plus\api\Identity_Plus_API;
 
 
 add_action( 'admin_enqueue_scripts', 'identity_plus_admin_styles' );
@@ -25,24 +26,14 @@ function identity_plus_settings_init(  ) {
 
         $problems = idp_problems(get_option( 'identity_plus_settings' ));
 
-		// if(!empty($options) && isset($options['cert-data'])){
-		// 		$cs = array();
-		// 		if(!openssl_pkcs12_read (base64_decode($options['cert-data']), $cs , isset($options['cert-password']) ? $options['cert-password'] : '')){
-		// 				add_settings_error('identity_plus_settings', 'identity-plus-api-certificate-error', "Certificate password might be wrong!", "error");
-		// 		}
-		// }
-		// else add_settings_error('identity_plus_settings', 'identity-plus-api-certificate-error', "API Certificate is missing!", "error");
-
 		if(!$problems){
-			register_setting( 'identity_plus_cert_section', 'identity_plus_settings' , 'identity_plus_handle_file_upload');
+			// register_setting( 'identity_plus_cert_section', 'identity_plus_settings' , 'identity_plus_handle_file_upload');
 
-			add_settings_section('identity_plus_access_section',	__( 'Resource Access', 'identity_plus' ), 'identity_plus_settings_section_callback', 'identity_plus_cert_section');
-			add_settings_field('enforce', __( 'Filtered Page Access', 'identity_plus' ), 'identity_plus_enforce_render', 'identity_plus_cert_section', 'identity_plus_access_section');
-	#		add_settings_field('lock-down', __( 'Lock Down Filtered Pages', 'identity_plus' ), 'identity_plus_lock_down_render', 'identity_plus_cert_section', 'identity_plus_access_section');
-			add_settings_field('page-filter', __( 'Page Filter', 'identity_plus' ), 'identity_plus_page_filter_render',	'identity_plus_cert_section', 	'identity_plus_access_section');
+			// add_settings_field('lock-down', __( 'Lock Down Filtered Pages', 'identity_plus' ), 'identity_plus_lock_down_render', 'identity_plus_cert_section', 'identity_plus_access_section');
+			// add_settings_field('page-filter', __( 'Page Filter', 'identity_plus' ), 'identity_plus_page_filter_render',	'identity_plus_cert_section', 	'identity_plus_access_section');
 		
-			add_settings_section('identity_plus_network_of_trust_section', __( 'Network Of Trust', 'identity_plus' ), 'identity_plus_not_section_callback', 'identity_plus_cert_section');
-			add_settings_field('comments', __( 'Comments', 'identity_plus' ),	'identity_plus_comments_render', 'identity_plus_cert_section', 'identity_plus_network_of_trust_section');
+			// add_settings_section('identity_plus_network_of_trust_section', __( 'Network Of Trust', 'identity_plus' ), 'identity_plus_not_section_callback', 'identity_plus_cert_section');
+			// add_settings_field('comments', __( 'Comments', 'identity_plus' ),	'identity_plus_comments_render', 'identity_plus_cert_section', 'identity_plus_network_of_trust_section');
 		}
 		else add_settings_error('identity_plus_settings', 'identity-plus-api-certificate-error', $problems, "error");
 }
@@ -52,7 +43,6 @@ function identity_plus_settings_init(  ) {
 function identity_plus_cert_file_render( ) {
 		?><input type="file" style="margin-top:5px;" name="identity-plus-api-cert-file" /><?php
 }
-
 
 
 function identity_plus_cert_password_render(  ) { 
@@ -74,9 +64,9 @@ function identity_plus_comments_render(  ) {
 
 function identity_plus_enforce_render(  ) {
 		$options = get_option( 'identity_plus_settings' );?>
-		<input type='checkbox' id='identity_plus_settings[enforce]' name='identity_plus_settings[enforce]' <?php isset($options['enforce']) ? checked( $options['enforce'], 1 ) : ""; ?> value='1'><label for='identity_plus_settings[enforce]'>Enforce Identity + Device Certificate</label>
-		<p class="identity-plus-hint" style="max-width:640px; font-size:90%; color:rgba(0, 0, 0, 0.6);">When Identity + certificate is enforced, resources starting with any of the enumerated filters will only 
-		be accessible from devices (desktop / laptop /mobile ) bearing a valid Identity + SSL Client Certificate. Local user roles apply</p><?php
+		<input type='checkbox' id='identity_plus_settings[enforce]' name='identity_plus_settings[enforce]' <?php isset($options['enforce']) ? checked( $options['enforce'], 1 ) : ""; ?> value='1'><label for='identity_plus_settings[enforce]'>Enforce Device Identity</label>
+		<p class="identity-plus-hint" style="max-width:640px; font-size:90%; color:rgba(0, 0, 0, 0.6); margin-bottom:10px; ">When Identity + certificate is enforced, resources starting with any of the enumerated filters will only 
+		be accessible from devices (desktop / laptop /mobile ) bearing a valid Identity + SSL Client Certificate. </p><?php
 }
 
 
@@ -91,8 +81,7 @@ function identity_plus_lock_down_render(  ) {
 
 function identity_plus_page_filter_render(  ) { 
 		$options = get_option( 'identity_plus_settings' );?>
-	 	<label for='identity_plus_settings[page-filter]'>One filter per line.</label>
-		<textarea cols='40' rows='5' name='identity_plus_settings[page-filter]'><?php echo isset($options['page-filter']) && strlen($options['page-filter']) > 0 ? $options['page-filter'] : "/wp-admin\n/wp-login.php"; ?></textarea>
+		<textarea cols='40' rows='5' name='identity_plus_settings[page-filter]'><?php echo isset($options['page-filter']) && strlen($options['page-filter']) > 0 ? $options['page-filter'] : "/wp-admin\n/wp-login.php\n/?rest_route=/\n/wp-json/"; ?></textarea>
 		<?php
 }
 
@@ -118,18 +107,18 @@ function identity_plus_admin_styles(  ) {
 				.identity-plus-main-fm{ float:left; overflow:hidden; clear:left;}
 				.identity-plus-main-fm-header {margin:0; background:url('<?php echo plugins_url( 'img/idp.svg', __FILE__ ) ?>') no-repeat top left; background-size:64px;}
 				.identity-plus-main-fm-header h1{padding-left:80px; padding-top:10px; margin-bottom:0; font-size:36px;font-weight:normal; }
-				.identity-plus-main-fm-header h5{padding-left:80px; font-size:20px; font-weight:300; padding-bottom:5px; padding-top:0; margin-top:15px;}
+				.identity-plus-main-fm-header h5{padding-left:80px; font-size:20px; font-weight:300; padding-bottom:5px; padding-top:0; margin:15px 0px 0px 0px;}
 
 				.identity-plus-main-fm p{margin:0;}
 				.identity-plus-main-fm th{padding-bottom:15px; padding-top:15px; color:#136a92;}
 				.identity-plus-main-fm td{padding-bottom:10px; padding-top:10px; }
-				.identity-plus-main-fm h2, .identity-plus-main-fm h3{border:1px solid rgba(0,0,0,0.1); border-bottom:0; background:#FFFFFF; float:left; clear:left; padding:8px 20px; margin-bottom:0px; color:#3282C3; font-weight:normal; border-top-left-radius:5px; border-top-right-radius:5px; margin-left:10px;}
+				.identity-plus-main-fm h2, .identity-plus-main-fm h3{border:1px solid rgba(0,0,0,0.1); border-bottom:0; background:rgba(0,0,0,0.05); float:left; clear:left; padding:8px 20px; margin-bottom:0px; color:#404040; font-weight:normal; border-top-left-radius:5px; border-top-right-radius:5px; margin-left:10px; margin-top:50px;}
 				.identity-plus-main-fm h4{border-bottom:1px solid #E0E0E0; color:#707070; padding-bottom:3px; padding-top:15px; margin-bottom:5px; font-weight:normal; font-size:16px;padding-top:0; margin-top:0; }
 				.identity-plus-main-fm .cert {max-width:600px; border-radius:3px; float:left; clear:both;}
 				.identity-plus-main-fm .cert p span{font-weight:bold;}
 				.identity-plus-main-fm .cert p{margin:0px; float:left; clear:left;}
 				.identity-plus-main-fm .cert {padding:10px; background:rgba(255, 255, 255, 0.6); border:1px solid rgba(0, 0, 0, 0.3);}
-				.identity-plus-separator{border-top:1px solid #909090; margin-top:0px; float:left; width:100%; clear:both; height:5px; margin-bottom:0px;}
+				.identity-plus-separator{border-top:1px solid rgba(0,0,0,0.1); margin-top:0px; float:left; width:100%; clear:both; height:5px; margin-bottom:0px;}
 				.identity-plus-hint{float:left; clear:both; max-width:600px; color:#606060; font-size:14px; margin-top:0px; margin-bottom:10px;}
                 .identity-plus-brand span{color:#4292D3;}
                 .identity-plus-main-fm input, .identity-plus-main-fm textarea{ float:left; clear:left;}
@@ -146,6 +135,11 @@ function identity_plus_admin_styles(  ) {
 				div.holder-more p.overlay span {font-weight: 300;font-size: 90%;color: #606060;}
 				#wpfooter{position:static;}
 				.nodisp{display:none;}
+				.identity-plus-main-fm input[type=checkbox], .identity-plus-main-fm input[type=radio]{margin:0px 10px 5px 0px; float;left; clear:left; box-shadow:none;}
+				.identity-plus-main-fm input[type=text]{padding:5px; box-shadow:none;}
+				.identity-plus-main-fm textarea{margin:0px 10px 5px 0px; float:left; clear:left; margin-bottom:20px; border-radius:0px; box-shadow:none; padding:5px 10px;}
+				.identity-plus-main-fm .submit{float:left; clear:left; margin-top:0px; padding:0px; height:32px;}
+				.identity-plus-main-fm .submit input[type="submit"]{background:#4292D3; color:#FFFFFF; padding:0px; border-radius:3px; border:1px solid rgba(0,0,0,0.1); cursor:pointer; box-shadow:none; text-shadow:none; font-size:14px; padding:2px 18px; height:auto;}
 		</style>
 		<?php 
 }
@@ -170,7 +164,6 @@ function identity_plus_api_section_callback(  ) {
 				if(openssl_pkcs12_read (base64_decode($options['cert-data']), $cs , isset($options['cert-password']) ? $options['cert-password'] : '')){
 						$cert_details = openssl_x509_parse($cs['cert']);
 						$now = time();
-						$your_date = strtotime(wp_get_current_user()->user_registered);
 						$days = floor(abs($cert_details['validTo_time_t'] - $now) / 86400);
 						$all_days = floor(abs($cert_details['validTo_time_t'] - $cert_details['validFrom_time_t']) / 86400);
 						$dash = $perimeter*($days*1.0/$all_days*1.0);
@@ -183,7 +176,7 @@ function identity_plus_api_section_callback(  ) {
 		</svg>
 		<p class="overlay"><span><?php echo $days == 0 ? "" : "Expires"; ?><br><?php echo $days == 0 ? "N/A" : date("yy, M, d", $cert_details['validTo_time_t']) ?></span><br><?php echo $days == 0 ? "" : $days . "d"?><span></span></p>
 	</div><?php
-	?><p style="margin:10px 0 0 0; float:left; clear:both; font-size:80%; max-width:550px; color:#808080;"><a target="_blank" href="https://my.identity.plus"><?php echo !isset($options['cert-data']) ? "Get A Certificate" : "Renew Certificate"; ?></a></p></div>
+	?></div>
 	</td><td valign="top">
 
 	<div class="identity-plus-main-fm">
@@ -199,13 +192,23 @@ function identity_plus_api_section_callback(  ) {
 		<a id="manual" class="toggle-off" onclick="toggle_renewal(1);">Manual</a>
 	</div>
 
-	<form id="renew-fm" class="identity-plus-main-fm" action="admin-post.php" method='post' enctype="multipart/form-data">
-			<input type="hidden" name="action" value="autorenew_certificate">
-			<div>
-				<p class="identity-plus-hint" style="font-size:13px; margin-bottom:5px;">To avoid outage, your service identity (certificate) will be renewed automatically in <?php echo ($days - $all_days/3); ?> days.</p>
-				<?php submit_button("Auto-Renew Now"); ?>
-			</div>
-	</form>
+	<?php if(empty($options) || !isset($options['cert-data'])){ ?>
+		<form id="renew-fm" class="identity-plus-main-fm" action="admin-post.php" method='post' enctype="multipart/form-data">
+				<input type="hidden" name="action" value="renew_certificate">
+				<div>
+					<p class="identity-plus-hint" style="font-size:13px; margin-bottom:5px;">Click the button below to add certify your ownership of this Wordpress instance.</p>
+					<?php submit_button("Certify Ownership"); ?>
+				</div>
+		</form>
+	<?php } else { ?>
+		<form id="renew-fm" class="identity-plus-main-fm" action="admin-post.php" method='post' enctype="multipart/form-data">
+				<input type="hidden" name="action" value="renew_certificate">
+				<div>
+					<p class="identity-plus-hint" style="font-size:13px; margin-bottom:5px;">To avoid outage, your service identity (certificate) will be renewed automatically in <?php echo floor($days - $all_days/3); ?> days.</p>
+					<?php submit_button("Auto-Renew Now"); ?>
+				</div>
+		</form>
+	<?php } ?>
 
 	<form id="upload-fm" class="nodisp" action="admin-post.php" method='post' enctype="multipart/form-data">
 			<input type="hidden" name="action" value="upload_certificate">
@@ -217,9 +220,63 @@ function identity_plus_api_section_callback(  ) {
 			</div>
 	</form>
 	</td></tr></table>
+
+	<div class="identity-plus-main-fm" >
+		<h2>Access Restrictions</h2>
+		<p class="identity-plus-separator" style="padding-top:5px;"></p><p class="identity-plus-hint">You can restrict access to critical sections of your site to authorized devices only. Add one resource pattern per line.</p>
+	</div>
+	<form id="upload-fm" class="identity-plus-main-fm" action="admin-post.php" method='post' enctype="multipart/form-data">
+			<input type="hidden" name="action" value="save_access">
+			<div>
+				<?php identity_plus_page_filter_render(); ?>
+				<?php identity_plus_enforce_render(); ?>
+				<?php submit_button("Save"); ?>
+			</div>
+	</form>
+	
+
+	<div class="identity-plus-main-fm" >
+		<h2>Network of Trust</h2>
+		<p class="identity-plus-separator" style="padding-top:5px;"></p><p class="identity-plus-hint">Collaborate with the Identity Plus community to better identify legitimate users using anonymized hooks (no personal information is shared). This will help eliminate SPAM and fake accounts.</p>
+	</div>
+	<form id="upload-fm" class="identity-plus-main-fm" action="admin-post.php" method='post' enctype="multipart/form-data">
+			<input type="hidden" name="action" value="not_enroll">
+			<div>
+				<?php submit_button(isset($options['not_enroll']) && $options['not_enroll'] == 1 ? "Disable" : "Enroll"); ?>
+			</div>
+	</form>
 	<?php
 }
 
+add_action( 'admin_post_not_enroll', 'identity_plus_admin_not_enroll');
+function identity_plus_admin_not_enroll(){
+	$options = get_option( 'identity_plus_settings');
+
+	if(isset($options['not_enroll']) && $options['not_enroll'] == 1) $options['not_enroll'] = 0;
+	else  $options['not_enroll'] = 1;
+
+	update_option( 'identity_plus_settings', $options);
+
+	wp_redirect( $_SERVER["HTTP_REFERER"], 302, 'WordPress' );
+	exit;
+	status_header(200);
+	die("Certificate uploaded.");
+}
+
+add_action( 'admin_post_save_access', 'identity_plus_admin_save_access');
+function identity_plus_admin_save_access(){
+	$options = get_option( 'identity_plus_settings');
+
+	$options['page-filter'] = $_POST["identity_plus_settings"]["page-filter"];
+	$options['enforce'] = $_POST["identity_plus_settings"]["enforce"];
+
+	update_option( 'identity_plus_settings', $options);
+
+	wp_redirect( $_SERVER["HTTP_REFERER"], 302, 'WordPress' );
+	exit;
+	status_header(200);
+	die("Certificate uploaded.");
+}
 
 
 function identity_plus_options_page(  ) { 
@@ -231,13 +288,6 @@ function identity_plus_options_page(  ) {
 		
 		<?php identity_plus_api_section_callback(); ?>
 
-		<form class="identity-plus-main-fm" action='options.php' method='post' enctype="multipart/form-data">
-				<?php
-						settings_fields( 'identity_plus_cert_section' );
-						do_settings_sections( 'identity_plus_cert_section' );
-						if(!idp_problems(get_option( 'identity_plus_settings' ))) submit_button();
-				?>
-		</form>
 		<?php
 }
 
@@ -268,14 +318,7 @@ function identity_plus_admin_upload_certificate(){
 
 add_action( 'admin_post_renew_certificate', 'identity_plus_admin_renew_certificate');
 function identity_plus_admin_renew_certificate(){
-	$options = get_option( 'identity_plus_settings');
-
-	if(!empty($_FILES["identity-plus-api-cert-file"]["tmp_name"])){
-		$options['cert-data'] = base64_encode(file_get_contents($_FILES["identity-plus-api-cert-file"]["tmp_name"]));
-		$options['cert-password'] = $_POST["identity_plus_settings"]["cert-password"];
-	}
-
-	update_option( 'identity_plus_settings', $options);
+	idenity_plus_renew_service_agent_certificate();
 
 	wp_redirect( $_SERVER["HTTP_REFERER"], 302, 'WordPress' );
 	exit;
@@ -291,21 +334,11 @@ function identity_plus_connect(){
         $options = get_option( 'identity_plus_settings' );
         if($identity_plus_api == null) $identity_plus_api = identity_plus_create_api($options);
 
-        if(false && isset($_SESSION['identity-plus-user-profile'])){
-            $profile = $identity_plus_api->bind_local_user($_SESSION['identity-plus-anonymous-id'], $user_id, $days);
-
-			$_SESSION['identity-plus-user-profile'] = $profile;
-            add_user_meta($user_id, 'identity-plus-bound', $user_id);
-            $error = "I: Your wordpress account and your identity plus account have been connected!";
-            set_transient("identity_plus_acc_{$user_id}", $error, 45);      
-
-            wp_redirect( $_SERVER['HTTP_REFERER'] );
-        }
-        else{
-            $user_info = get_userdata($user_id);
-            $intent = $identity_plus_api->create_intent(Intent_Type::bind, $user_id, $user_info->user_firstname . ' ' . $user_info->user_lastname, $user_info->user_email, '', $_SERVER['HTTP_REFERER'] . '&bind=true');
-            wp_redirect('https://get.identity.plus?intent=' . $intent->value);
-        }
+		$user_info = get_userdata($user_id);
+		$intent = $identity_plus_api->create_intent(Intent_Type::bind, $user_id, $user_info->user_firstname . ' ' . $user_info->user_lastname, $user_info->user_email, '', $_SERVER['HTTP_REFERER'] . '&bind=true');
+		unset($_SESSION['identity-plus-user-profile']);
+		unset($_SESSION['identity-plus-anonymous-id']);
+		wp_redirect(Identity_Plus_API::validation_endpoint.'/' . $intent->value);
 
         exit();
 }
@@ -374,13 +407,13 @@ function identity_plus_idp_page(  ) {
                     </tr></table>
 
                     <h2>Disconnect</h2><p class="identity-plus-separator" style="padding-top:5px;"></p>
-                    <?php if(isset($options['enforce']) && checked( $options['enforce'], 1 )){ ?>
+                    <?php if(isset($options['enforce']) && $options['enforce'] == 1 ){ ?>
                         <p class="identity-plus-hint" >Your <a href="<?php echo admin_url('options-general.php?page=identity_plus_network_of_trust'); ?>">identityplus settings</a> only allow admin access from certified devices. Disconnect is disabled as you would lock yourself out from admin section.</p>
                     <?php } else { ?>
                         <p class="identity-plus-hint" >By disconnecting your identityplus account from the local account, you will lose the ability to sign in via device id. Are you sure?</p>
                         <input type="hidden" name="action" value="identity_plus_disconnect">
-                        <div><input type="checkbox" id="idp-i-am-sure" name="idp-i-am-sure" onchange="document.getElementById('identity_plus_disconnect').style.display = document.getElementById('idp-i-am-sure').checked ? 'block' : 'none';"><label for="idp-i-am-sure">Yes, I am sure I want to disconnect.</label></div>
-                        <input type="submit" id="identity_plus_disconnect" style="display:none; background:#900000; color:#FFFFFF; padding:7px 15px 5px 15px; border-radius:2px; border:1px solid #500000" value="DISCONNECT">
+                        <div style="margin-top:10px;"><input type="checkbox" id="idp-i-am-sure" name="idp-i-am-sure" onchange="document.getElementById('identity_plus_disconnect').style.display = document.getElementById('idp-i-am-sure').checked ? 'block' : 'none';"><label for="idp-i-am-sure">Yes, I am sure I want to disconnect.</label></div>
+                        <input type="submit" id="identity_plus_disconnect" style="display:none; background:#900000; color:#FFFFFF; padding:8px 18px 6px 18px; border-radius:3px; border:1px solid rgba(0,0,0,0.1);" value="Disconnect">
                     <?php } ?>
 
                 <?php } else if(isset($_SESSION['identity-plus-user-profile'])){ ?>
@@ -396,7 +429,7 @@ function identity_plus_idp_page(  ) {
                     
                     <p class="identity-plus-hint" >Connect your identity<span class="identity-plus-brand">plus</span> account for secure, password-less login experience.</p>
                     <input type="hidden" name="action" value="identity_plus_connect">
-                    <input type="submit" id="identity_plus_disconnect" style="background:#303030; color:#62B2F3; padding:7px 15px 5px 15px; border-radius:2px; border:1px solid #000000" value="CONNECT">
+                    <input type="submit" id="identity_plus_disconnect" style="background:#4292D3; color:#FFFFFF; padding:8px 18px 6px 18px; border-radius:3px; border:1px solid rgba(0,0,0,0.1); cursor:pointer; margin-top:10px;" value="Connect">
                 <?php } else { ?>
                     <table><tr>
                    	    	<td>

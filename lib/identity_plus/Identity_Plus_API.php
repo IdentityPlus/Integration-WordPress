@@ -19,6 +19,8 @@ use identity_plus\api\communication\Intrusion_Reference;
 use identity_plus\api\communication\Intent_Type;
 use identity_plus\api\communication\Intent;
 use identity_plus\api\communication\Intent_Reference;
+use identity_plus\api\communication\Service_Agent_Identity_Request;
+use identity_plus\api\communication\Service_Agent_Identity;
 
 /*
  * (C) Copyright 2016 Identity+ (https://identity.plus) and others.
@@ -121,7 +123,7 @@ class Identity_Plus_API {
      * @return The url where to redirect
      */
     public function certificate_validation_endpoint($return_url = NULL){
-        	if($return_url == NULL){
+        if($return_url == NULL){
     		session_start();
     		$_SESSION['identity-plus-return-query'] =  Identity_Plus_Utils::here().Identity_Plus_Utils::query();
     		$return_url = Identity_Plus_Utils::here();
@@ -130,7 +132,21 @@ class Identity_Plus_API {
         $intent = $this->create_intent(Intent_Type::discover, NULL, NULL, NULL, NULL, $return_url);
         return self::validation_endpoint.'/' . $intent->value;
     }
+
+    /**
+     * Renew Identity Plus Service Agent ID
+     * 
+     * @param unknown $service_domain the service to which the agent belongs. The service the current agent represents must be administrator 
+     * over the target service. By default it is the service the agent belongs (self renew)
+     * @param unknown $agent_name the name of the agent, if not provided it will be taken from the certificate (self renew)
+     * @return if all goes well an updated Service_Agent_Identity otherwise a Simple_Response containing an error code
+     */
+    public function issue_service_agent_identity($service_domain, $agent_name){
+    	$request = new Service_Agent_Identity_Request($service_domain, $agent_name);
+    	return $this->issue_call($request, "PUT");
+    }
     
+   
     /**
      * Initiates an binding API Call which will bind the local user to the identity + account with the given anonymoys id.
      * This must be the user which is currently in the browser with the given recognized and valid certificate. This call
@@ -321,12 +337,13 @@ class Identity_Plus_API {
      * @param unknown A response Object.
      */
 	public static function decode($data){
-        error_log(var_dump($data));
+        error_log('------------------\n'.json_encode($data).'------------------\n');
         
 		if(property_exists($data, 'Identity-Profile')) return new Identity_Profile($data->{'Identity-Profile'});
 		else if(property_exists($data, 'Reference-Number')) return new Reference_Number($data->{'Reference-Number'});
 		else if(property_exists($data, 'Anonymous-ID')) return new Anonymous_ID($data->{'Anonymous-ID'});
 		else if(property_exists($data, 'Intent-Reference')) return new Intent_Reference($data->{'Intent-Reference'});
+		else if(property_exists($data, 'Service-Agent-Identity')) return new Service_Agent_Identity($data->{'Service-Agent-Identity'});
 		else return new Simple_Response($data->{'Simple-Response'});
 	}
 	

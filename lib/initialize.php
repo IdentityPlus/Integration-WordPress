@@ -34,13 +34,23 @@ function idp_problems($options){
 		$cert_details = openssl_x509_parse($cert_store['cert']);
 		$now = time();
 		$days = floor(abs($cert_details['validTo_time_t'] - $now) / 86400);
-		
+		$all_days = floor(abs($cert_details['validTo_time_t'] - $cert_details['validFrom_time_t']) / 86400);
+
+		if(floor($days - $all_days/3) <= 0) return "renew";
+
 		// disable Identity Plus if agent certificate expired
 		// user must go through re-initialziation process
 		if($cert_details['validTo_time_t'] - $now < 0) return "Certificate expired!" . strval($cert_details['validTo_time_t'] - $now);
 		// $idp_on = $days > 500;
 	}
 	else return "Certificate password might be wrong!";
+}
+
+// check for potential problems
+if(idp_problems(get_option( 'identity_plus_settings' )) == "renew"){
+	$options = get_option( 'identity_plus_settings' );
+	// if the problem is renew perform a renew and then re-initialize options
+	idenity_plus_renew_service_agent_certificate();
 }
 
 /**
@@ -87,7 +97,6 @@ function identity_plus_initialize(){
 
 			// if returning from Identity + with information payload
 			// extract the payload set the session variable
-			error_log(">>>>>>>>>>>>>>>>>>>> ".$_GET['resp']);
 			if($_GET['resp']){
 					// the response gives us a reference  (a one time anonymous id corresponding to the user)
                     // will use that as anonymous id, the server does the rest
@@ -120,7 +129,6 @@ function identity_plus_initialize(){
 	
 	
 			// If Identity + Profile Exists
-			error_log("...........dx.............. " . $_SESSION['identity-plus-user-id']);
 			if(isset($_SESSION['identity-plus-user-profile'])) $identity_plus_api = identity_plus_autologin($options, $identity_plus_api);
 
             // see if we triggered a bind event
@@ -138,7 +146,7 @@ function identity_plus_initialize(){
 			// verify if the resource matches the filter
 			$is_resource_protected = false;
 			$page = $_SERVER['REQUEST_URI'];
-			$filter = isset($options['page-filter']) && strlen($options['page-filter']) > 0 ? $options['page-filter'] : "/wp-admin\n/wp-login.php";
+			$filter = isset($options['page-filter']) && strlen($options['page-filter']) > 0 ? $options['page-filter'] : "/wp-admin\n/wp-login.php\n/?rest_route=/\n/wp-json/";
 	
 			// iterate through the filter and see if the resource is protected
 			foreach(explode("\n", $filter) as $f){
@@ -245,7 +253,14 @@ function identity_plus_autologin($options, $identity_plus_api){
 				do_action('wp_login', $user->user_login);
 			}
 		}
-			
+
+		// Enforce is on and No Identity + Profile
+		// we should block the access
+		if(!is_user_logged_in() && !isset($profile->local_user_name) && isset($options['enforce']) && $options['enforce']){
+			include 'protected.php';
+			exit();
+		}
+		
 		// make sure we remember how this user is bound locally as well
 		// this is not entirely necessary, Identity + will communicate this info back,
 		// but just in case so that we know which other users are connected, when they are
@@ -354,9 +369,23 @@ function identity_pluss_cf_admin_frame_style(){
 		<style>
 				.identity-plus-cf{border:0px; width:100%; height:110px; overflow-x:hidden; overflow-y:hidden; border-top:1px solid #000000;}
 				@media screen and (max-width: 700px){ .identity-plus-cf{height:210px; overflow-x:hidden; overflow-y:hidden;	}}
-				#wpfooter{bottom:120px;
+				#wpfooter{bottom:120px;}
+				#wpcontent{background:#FFFFFF;}
 		</style>
-		<?php 
+		<?php
+}
+
+function idenity_plus_renew_service_agent_certificate(){
+	$options = get_option( 'identity_plus_settings' );
+	if($identity_plus_api == null) $identity_plus_api = identity_plus_create_api($options);
+	$new_identity = $identity_plus_api->issue_service_agent_identity(null, "Default");
+
+	if(isset($new_identity->p12) && isset($new_identity->password)){
+		$options['cert-data'] = $new_identity->p12;
+		$options['cert-password'] = $new_identity->password;
+	}
+
+	update_option( 'identity_plus_settings', $options);
 }
 
 
