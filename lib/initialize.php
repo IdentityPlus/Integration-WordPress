@@ -217,6 +217,7 @@ function identity_plus_obtain_user_profile($options, $identity_plus_api){
  * Facilitate auto binding of the current user
  */
 function auto_bind_current_user(){
+	// get the options again and create the api
 	$options = get_option( 'identity_plus_settings' );
 	if($identity_plus_api == null) $identity_plus_api = identity_plus_create_api($options);
 	
@@ -224,7 +225,15 @@ function auto_bind_current_user(){
 	$your_date = strtotime(wp_get_current_user()->user_registered);
 	$days = ceil(abs($now - $your_date) / 86400);
 	$profile = $identity_plus_api->bind_local_user($_SESSION['identity-plus-anonymous-id'], wp_get_current_user()->ID, $days);
-	$_SESSION['identity-plus-user-profile'] = $profile;
+	
+	// make sure we are have a local user id bound
+	if($profile->local_user_name){
+		add_user_meta($user_id, 'identity-plus-bound', $profile->local_user_name);
+
+		// update session data with fresh information after binding
+		$_SESSION['identity-plus-user-profile'] = $profile;
+		$_SESSION['identity-plus-anonymous-id'] = $profile->authorizing_certificate;
+	}
 }
 
 /**
@@ -393,15 +402,15 @@ function idenity_plus_renew_service_agent_certificate(){
 	}
 
 	update_option( 'identity_plus_settings', $options);
-
-	$identity_plus_api == null;
-	unset($_SESSION['identity-plus-user-profile']);
-
-	auto_bind_current_user();
 }
 
 function idenity_plus_issue_service_agent_certificate(){
 	$options = get_option( 'identity_plus_settings' );
+
+	// we remember this reference because we will fetch the user profile with it
+	// instead of the certificate id, if we do not already have one
+	if(!isset($_SESSION['identity-plus-anonymous-id'])) $_SESSION['identity-plus-anonymous-id'] = $_GET['identity-plus-register-intent'];
+
 	if($identity_plus_api == null) $identity_plus_api = identity_plus_create_api($options);
 	$new_identity = $identity_plus_api->register_service($_GET['identity-plus-register-intent'], "Default");
 

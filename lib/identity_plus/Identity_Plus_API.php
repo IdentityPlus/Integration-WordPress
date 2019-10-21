@@ -63,8 +63,8 @@ use identity_plus\api\communication\Service_Agent_Identity;
  * @author Stefan Harsan Farr
  */
 class Identity_Plus_API {
-	const HOME = "identity.plus";
-	// const HOME = "local.stefanfarr.identityplus.app";
+	// const HOME = "identity.plus";
+	const HOME = "local.stefanfarr.identityplus.app";
     const api_endpoint = "https://api." . self::HOME . "/v1";
 	const validation_endpoint = "https://signon." . self::HOME;
 	
