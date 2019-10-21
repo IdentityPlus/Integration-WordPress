@@ -342,6 +342,11 @@ class Identity_Profile extends API_Response{
      */
     public $local_intrusions;
 	
+    /**
+     * In case this was an out of band authorization, the id of the certificate that made the authorization
+     */
+	public $authorizing_certificate;
+
 	/**
 	 * Empty initializer, it is necessary to initialize to null the public fields.
 	 * The deserializer will override the final modifier and re-initialize the fields
@@ -359,6 +364,7 @@ class Identity_Profile extends API_Response{
 		$this->trust_score = $data->{'trust-score'};
 		$this->local_trust = $data->{'local-trust'};
 		$this->local_intrusions = $data->{'local-intrusions'};
+		if(isset($data->{'authorizing-certificate'})) $this->authorizing_certificate = $data->{'authorizing-certificate'};
 	}
 }
 

@@ -22,20 +22,9 @@ function identity_plus_add_admin_menu(  ) {
 
 
 function identity_plus_settings_init(  ) {
-        if(!function_exists("curl_init")) add_settings_error('identity_plus_settings', 'identity-plus-curl-error', "Curl extension is not installed on the server! Identity + needs php5-curl extension to work. <br>(for Ubuntu type: sudo apt-get install php5-curl)", "error");
-
+        if(!function_exists("curl_init")) add_settings_error('identity_plus_settings', 'identity-plus-curl-error', "Curl extension is not installed on the server! Identity + needs php-curl extension to work. <br>(for Ubuntu type: sudo apt-get install php-curl)", "error");
         $problems = idp_problems(get_option( 'identity_plus_settings' ));
-
-		if(!$problems){
-			// register_setting( 'identity_plus_cert_section', 'identity_plus_settings' , 'identity_plus_handle_file_upload');
-
-			// add_settings_field('lock-down', __( 'Lock Down Filtered Pages', 'identity_plus' ), 'identity_plus_lock_down_render', 'identity_plus_cert_section', 'identity_plus_access_section');
-			// add_settings_field('page-filter', __( 'Page Filter', 'identity_plus' ), 'identity_plus_page_filter_render',	'identity_plus_cert_section', 	'identity_plus_access_section');
-		
-			// add_settings_section('identity_plus_network_of_trust_section', __( 'Network Of Trust', 'identity_plus' ), 'identity_plus_not_section_callback', 'identity_plus_cert_section');
-			// add_settings_field('comments', __( 'Comments', 'identity_plus' ),	'identity_plus_comments_render', 'identity_plus_cert_section', 'identity_plus_network_of_trust_section');
-		}
-		else add_settings_error('identity_plus_settings', 'identity-plus-api-certificate-error', $problems, "error");
+		if($problems) add_settings_error('identity_plus_settings', 'identity-plus-api-certificate-error', $problems, "error");
 }
 
 
@@ -122,7 +111,7 @@ function identity_plus_admin_styles(  ) {
 				.identity-plus-hint{float:left; clear:both; max-width:600px; color:#606060; font-size:14px; margin-top:0px; margin-bottom:10px;}
                 .identity-plus-brand span{color:#4292D3;}
                 .identity-plus-main-fm input, .identity-plus-main-fm textarea{ float:left; clear:left;}
-=                .identity-plus-main-fm input[type="checkbox"]{ margin-top:0; margin-right:5px;}
+                .identity-plus-main-fm input[type="checkbox"]{ margin-top:0; margin-right:5px;}
                 .identity-plus-main-fm label{ float:left; font-weight:400;}
                 .identity-plus-main-fm div{float:left; clear:left; overflow:hidden; margin-bottom:10px;}
                 .identity-plus-main-fm table{max-width:600px; float:left; clear:left;}
@@ -139,47 +128,59 @@ function identity_plus_admin_styles(  ) {
 				.identity-plus-main-fm input[type=text]{padding:5px; box-shadow:none;}
 				.identity-plus-main-fm textarea{margin:0px 10px 5px 0px; float:left; clear:left; margin-bottom:20px; border-radius:0px; box-shadow:none; padding:5px 10px;}
 				.identity-plus-main-fm .submit{float:left; clear:left; margin-top:0px; padding:0px; height:32px;}
-				.identity-plus-main-fm .submit input[type="submit"]{background:#4292D3; color:#FFFFFF; padding:0px; border-radius:3px; border:1px solid rgba(0,0,0,0.1); cursor:pointer; box-shadow:none; text-shadow:none; font-size:14px; padding:2px 18px; height:auto;}
+				.identity-plus-main-fm .submit input[type="submit"]{text-decoration:none; background:#4292D3; color:#FFFFFF; display:inline-block; border-radius:3px; border:1px solid rgba(0,0,0,0.1); cursor:pointer; box-shadow:none; text-shadow:none; font-size:14px; padding:2px 18px; height:auto;}
+				.identity-plus-main-fm a.submit{text-decoration:none; background:#4292D3; color:#FFFFFF; display:inline-block; border-radius:3px; border:1px solid rgba(0,0,0,0.1); cursor:pointer; box-shadow:none; text-shadow:none; font-size:14px; padding:6px 18px; height:auto;}
 		</style>
 		<?php 
 }
 
 
 function identity_plus_api_section_callback(  ) {
+	$problems = idp_problems(get_option( 'identity_plus_settings' ));
+
 	?>
 	
 	<div class="identity-plus-main-fm" >
 		<h2>Service Identity</h2>
-		<p class="identity-plus-separator" style="padding-top:5px;"></p><p class="identity-plus-hint">This is the PKI credential your Worpress instance authenticates into Indentity Plus. This is necessary to make sure nobody impersonates your service.</p>
+		<p class="identity-plus-separator" style="padding-top:5px;"></p>
+		<p class="identity-plus-hint">Your Worpress uses PKI credentials to authenticate into Indentity Plus. This is necessary to make sure nobody impersonates your service.</p>
 	</div>
 	<div class="identity-plus-main-fm" >
-	<table class=""><tr><td valign="top">
-	<div class="holder-more"><?php
-		$perimeter = 2*3.14*60;
-		$options = get_option( 'identity_plus_settings' );
-		$dash = 0;
-		$days = 0;
-		if(!empty($options) && isset($options['cert-data'])){
-				$cs = array();
-				if(openssl_pkcs12_read (base64_decode($options['cert-data']), $cs , isset($options['cert-password']) ? $options['cert-password'] : '')){
-						$cert_details = openssl_x509_parse($cs['cert']);
-						$now = time();
-						$days = floor(abs($cert_details['validTo_time_t'] - $now) / 86400);
-						$all_days = floor(abs($cert_details['validTo_time_t'] - $cert_details['validFrom_time_t']) / 86400);
-						$dash = $perimeter*($days*1.0/$all_days*1.0);
-				}
-		}
-		?><div class="holder-more">
-		<svg width="124.0" height="124.0" viewBox="0 0 124.0 124.0" class="circular_progress">
-			<circle cx="62.0" cy="62.0" r="60.0" fill="none" stroke="#E7E7E7" stroke-width="1.5"></circle>
-			<circle cx="62.0" cy="62.0" r="60.0" fill="none" stroke="#007aD0" stroke-width="1.5" stroke-dasharray="<?php echo $perimeter; ?>" stroke-dashoffset="<?php echo ($perimeter - $dash);?>"></circle>
-		</svg>
-		<p class="overlay"><span><?php echo $days == 0 ? "" : "Expires"; ?><br><?php echo $days == 0 ? "N/A" : date("yy, M, d", $cert_details['validTo_time_t']) ?></span><br><?php echo $days == 0 ? "" : $days . "d"?><span></span></p>
-	</div><?php
-	?></div>
-	</td><td valign="top">
+	<table class=""><tr>
 
-	<div class="identity-plus-main-fm">
+	<?php
+	
+	if(!$problems){
+		// display dial for certificate lifetime
+		// and expiry
+		?>
+		<td valign="top"><div class="holder-more"><?php
+			$perimeter = 2*3.14*60;
+			$options = get_option( 'identity_plus_settings' );
+			$dash = 0;
+			$days = 0;
+			if(!empty($options) && isset($options['cert-data'])){
+					$cs = array();
+					if(openssl_pkcs12_read (base64_decode($options['cert-data']), $cs , isset($options['cert-password']) ? $options['cert-password'] : '')){
+							$cert_details = openssl_x509_parse($cs['cert']);
+							$now = time();
+							$days = floor(abs($cert_details['validTo_time_t'] - $now) / 86400);
+							$all_days = floor(abs($cert_details['validTo_time_t'] - $cert_details['validFrom_time_t']) / 86400);
+							$dash = $perimeter*($days*1.0/$all_days*1.0);
+					}
+			}
+			?><div class="holder-more">
+			<svg width="124.0" height="124.0" viewBox="0 0 124.0 124.0" class="circular_progress">
+				<circle cx="62.0" cy="62.0" r="60.0" fill="none" stroke="#E7E7E7" stroke-width="1.5"></circle>
+				<circle cx="62.0" cy="62.0" r="60.0" fill="none" stroke="#007aD0" stroke-width="1.5" stroke-dasharray="<?php echo $perimeter; ?>" stroke-dashoffset="<?php echo ($perimeter - $dash);?>"></circle>
+			</svg>
+			<p class="overlay"><span><?php echo $days == 0 ? "" : "Expires"; ?><br><?php echo $days == 0 ? "N/A" : date("yy, M, d", $cert_details['validTo_time_t']) ?></span><br><?php echo $days == 0 ? "" : $days . "d"?><span></span></p>
+		</div><?php
+		?></div>
+		</td>
+	<?php } ?>
+
+	<td valign="top"><div class="identity-plus-main-fm">
 		<script>
 			function toggle_renewal(mode){
 				document.getElementById('renew-fm').className = mode == 0 ? 'identity-plus-hint' : 'nodisp'; 
@@ -194,10 +195,9 @@ function identity_plus_api_section_callback(  ) {
 
 	<?php if(empty($options) || !isset($options['cert-data'])){ ?>
 		<form id="renew-fm" class="identity-plus-main-fm" action="admin-post.php" method='post' enctype="multipart/form-data">
-				<input type="hidden" name="action" value="renew_certificate">
 				<div>
 					<p class="identity-plus-hint" style="font-size:13px; margin-bottom:5px;">Click the button below to add certify your ownership of this Wordpress instance.</p>
-					<?php submit_button("Certify Ownership"); ?>
+					<a class="submit" href="<?php echo("https://register." . Identity_Plus_API::HOME . "/?url=" . urlencode((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]"));?>" target="_blank">Certify Ownership</a>
 				</div>
 		</form>
 	<?php } else { ?>
@@ -221,31 +221,35 @@ function identity_plus_api_section_callback(  ) {
 	</form>
 	</td></tr></table>
 
-	<div class="identity-plus-main-fm" >
-		<h2>Access Restrictions</h2>
-		<p class="identity-plus-separator" style="padding-top:5px;"></p><p class="identity-plus-hint">You can restrict access to critical sections of your site to authorized devices only. Add one resource pattern per line.</p>
-	</div>
-	<form id="upload-fm" class="identity-plus-main-fm" action="admin-post.php" method='post' enctype="multipart/form-data">
-			<input type="hidden" name="action" value="save_access">
-			<div>
-				<?php identity_plus_page_filter_render(); ?>
-				<?php identity_plus_enforce_render(); ?>
-				<?php submit_button("Save"); ?>
-			</div>
-	</form>
-	
+	<?php if(!$problems){ 
+		// add the access restriction configuration section
+		// and also the network of trust enrollment
+		?>
+		<div class="identity-plus-main-fm" >
+			<h2>Access Restrictions</h2>
+			<p class="identity-plus-separator" style="padding-top:5px;"></p><p class="identity-plus-hint">You can restrict access to critical sections of your site to authorized devices only. Add one resource pattern per line.</p>
+		</div>
+		<form id="upload-fm" class="identity-plus-main-fm" action="admin-post.php" method='post' enctype="multipart/form-data">
+				<input type="hidden" name="action" value="save_access">
+				<div>
+					<?php identity_plus_page_filter_render(); ?>
+					<?php identity_plus_enforce_render(); ?>
+					<?php submit_button("Save"); ?>
+				</div>
+		</form>
 
-	<div class="identity-plus-main-fm" >
-		<h2>Network of Trust</h2>
-		<p class="identity-plus-separator" style="padding-top:5px;"></p><p class="identity-plus-hint">Collaborate with the Identity Plus community to better identify legitimate users using anonymized hooks (no personal information is shared). This will help eliminate SPAM and fake accounts.</p>
-	</div>
-	<form id="upload-fm" class="identity-plus-main-fm" action="admin-post.php" method='post' enctype="multipart/form-data">
-			<input type="hidden" name="action" value="not_enroll">
-			<div>
-				<?php submit_button(isset($options['not_enroll']) && $options['not_enroll'] == 1 ? "Disable" : "Enroll"); ?>
-			</div>
-	</form>
+		<div class="identity-plus-main-fm" >
+			<h2>Network of Trust</h2>
+			<p class="identity-plus-separator" style="padding-top:5px;"></p><p class="identity-plus-hint">Collaborate with the Identity Plus community to better identify legitimate users using anonymized hooks (no personal information is shared). This will help eliminate SPAM and fake accounts.</p>
+		</div>
+		<form id="upload-fm" class="identity-plus-main-fm" action="admin-post.php" method='post' enctype="multipart/form-data">
+				<input type="hidden" name="action" value="not_enroll">
+				<div>
+					<?php submit_button(isset($options['not_enroll']) && $options['not_enroll'] == 1 ? "Disable" : "Enroll"); ?>
+				</div>
+		</form>
 	<?php
+	}
 }
 
 add_action( 'admin_post_not_enroll', 'identity_plus_admin_not_enroll');
@@ -286,9 +290,9 @@ function identity_plus_options_page(  ) {
 			<h5>man &amp; machine</h5>
 		</div>
 		
-		<?php identity_plus_api_section_callback(); ?>
-
-		<?php
+		<?php 
+		
+		identity_plus_api_section_callback();
 }
 
 
@@ -325,6 +329,7 @@ function identity_plus_admin_renew_certificate(){
 	status_header(200);
 	die("Certificate renewed.");
 }
+
 
 # -------------------------- Id + Menu Page
 

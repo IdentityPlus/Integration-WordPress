@@ -63,10 +63,10 @@ use identity_plus\api\communication\Service_Agent_Identity;
  * @author Stefan Harsan Farr
  */
 class Identity_Plus_API {
-    const api_endpoint = "https://api.identity.plus/v1";
-    const validation_endpoint = "https://signon.identity.plus";
-    // const api_endpoint = "https://dev-api.identity.plus:8443/v1";
-	// const validation_endpoint = "https://my.dev.identity.plus:8443";
+	const HOME = "identity.plus";
+	// const HOME = "local.stefanfarr.identityplus.app";
+    const api_endpoint = "https://api." . self::HOME . "/v1";
+	const validation_endpoint = "https://signon." . self::HOME;
 	
     public $cert_details;
     private $private_key;
@@ -146,6 +146,34 @@ class Identity_Plus_API {
     	return $this->issue_call($request, "PUT");
     }
     
+    public function register_service($register_intent, $agent_name){
+    	$args = array(
+            "authorization" => $register_intent, 
+            "agent-name" => $agent_name
+        );
+
+    	$request = array(
+            "operation" => "issue-service-agent-certificate", 
+            "args" => $args
+        );
+        
+        $call = curl_init(self::validation_endpoint . "/api/v1");
+        
+    	// curl_setopt($call, CURLOPT_VERBOSE, true);
+    	curl_setopt($call, CURLOPT_URL, self::validation_endpoint . "/api/v1");
+  		curl_setopt($call, CURLOPT_CUSTOMREQUEST, "POST");
+    	curl_setopt($call, CURLOPT_POSTFIELDS, json_encode($request)); 
+    	curl_setopt($call, CURLOPT_RETURNTRANSFER, true);
+        
+        curl_setopt($call, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($call, CURLOPT_SSL_VERIFYHOST, false);
+    	
+    	$result = curl_exec($call);
+    	    	
+    	curl_close ($call);
+    	
+        return self::decode(json_decode($result));
+    }
    
     /**
      * Initiates an binding API Call which will bind the local user to the identity + account with the given anonymoys id.
@@ -293,7 +321,10 @@ class Identity_Plus_API {
   		curl_setopt($call, CURLOPT_CUSTOMREQUEST, $method);
     	curl_setopt($call, CURLOPT_POSTFIELDS, $request->to_json()); 
     	curl_setopt($call, CURLOPT_RETURNTRANSFER, true);
-    	
+        
+        curl_setopt($call, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($call, CURLOPT_SSL_VERIFYHOST, false);
+
     	$result = curl_exec($call);
     	
     	if($debug){
@@ -320,17 +351,7 @@ class Identity_Plus_API {
     	openssl_private_encrypt($raw_data, $encrypted, $this->private_key);
     	return $encrypted;
     }
-    
-    /**
-     * An decryption function wrapper using the API certificate's private key
-     * 
-     * @param unknown $data: data to be decrypted. It is expected to be encrypted with the certificate's public key
-     * @return decrypted data
-     */
-    public function decrypt($data){
-    	openssl_private_decrypt($data, $decrypted, $this->private_key);
-    	return $decrypted;
-    }
+
 
     /**
      * Identifies the JSON object in the response and decodes it into the corresponding PHP Object 
@@ -366,30 +387,4 @@ class Identity_Plus_API {
 		return $challenge;
 	}
 	
-	
-	
-	/**
-	 * Extract the identity + anonymous id from a returning url.
-	 * This happens upon a redirect-back from Identity +
-	 *
-	 * @param unknown &$http_session, the session variable, so that we don't hard code around session
-	 */
-	function legacy_http_extract_anonymous_id(&$http_session){
-		$payload =  Identity_Plus_Utils::base64url_decode($_GET['idp-api-response']);
-		$response = $this->decrypt($payload);
-
-		$serial_number = Identity_Plus_API::decode(json_decode($response));
-		if($serial_number instanceof Anonymous_ID){
-			$http_session['identity-plus-anonymous-id'] = $serial_number->serial_number;
-		}
-		else $http_session['identity-plus-anonymous-id'] = 'N/A';
-	
-		// clear the identity + id extraction url to eliminate confusion
-		// and complications
-		if(!isset($http_session['identity-plus-return-query'])){
-			$q = Identity_Plus_Utils::query();
-			$q = substr($q, 0, strpos($q, "idp-api-response=") -1);
-			$http_session['identity-plus-return-query'] = Identity_Plus_Utils::here().$q;
-		}
-	}
 }

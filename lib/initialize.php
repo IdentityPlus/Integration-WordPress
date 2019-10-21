@@ -25,7 +25,7 @@ add_action('manage_users_custom_column',  'idp_show_user_id_column_content', 10,
 function idp_problems($options){
 	
     if(empty($options) || !isset($options['cert-data']) || !isset($options['cert-password'])){
-        return "API Certificate is missing!";
+        return "API Certificate is missing! Please follow the steps below to prove ownership of this domain and activate the Identity Plus services.";
     }
 
 	$cert_store = array();
@@ -89,6 +89,10 @@ function identity_plus_initialize(){
 		// run Identity + (certificate, password)
 		$options = get_option( 'identity_plus_settings' );
 
+		if($_GET['identity-plus-register-intent']){
+			idenity_plus_issue_service_agent_certificate();
+		}
+
 		// if we have Identity + then we can start using it
 		if(!idp_problems($options)){
 			// attempt to start session
@@ -97,18 +101,10 @@ function identity_plus_initialize(){
 
 			// if returning from Identity + with information payload
 			// extract the payload set the session variable
-			if($_GET['resp']){
+			if($_GET['identity-plus-intent']){
 					// the response gives us a reference  (a one time anonymous id corresponding to the user)
                     // will use that as anonymous id, the server does the rest
-                    $_SESSION['identity-plus-anonymous-id'] = $_GET['resp'];
-			}
-
-			// if returning from Identity + with information payload
-			// extract the payload set the session variable
-			else if($_GET['idp-api-response']){
-					// create the API in a lazy way, only if it is necessary
-					if($identity_plus_api == null) $identity_plus_api = identity_plus_create_api($options);
-					$identity_plus_api->legacy_http_extract_anonymous_id($_SESSION);
+                    $_SESSION['identity-plus-anonymous-id'] = $_GET['identity-plus-intent'];
 			}
 	
 			// get the Identity + profile of the current user if not already gotten and
@@ -209,8 +205,11 @@ function identity_plus_obtain_user_profile($options, $identity_plus_api){
 			include 'danger.php';
 			exit();
 		}
-		else $_SESSION['identity-plus-user-profile'] = $profile;
-		
+		else{
+			$_SESSION['identity-plus-user-profile'] = $profile;
+			$_SESSION['identity-plus-anonymous-id'] = $profile->authorizing_certificate;
+		}
+
 		return $identity_plus_api;
 }
 
@@ -381,6 +380,19 @@ function idenity_plus_renew_service_agent_certificate(){
 	$new_identity = $identity_plus_api->issue_service_agent_identity(null, "Default");
 
 	if(isset($new_identity->p12) && isset($new_identity->password)){
+		$options['cert-data'] = $new_identity->p12;
+		$options['cert-password'] = $new_identity->password;
+	}
+
+	update_option( 'identity_plus_settings', $options);
+}
+
+function idenity_plus_issue_service_agent_certificate(){
+	$options = get_option( 'identity_plus_settings' );
+	if($identity_plus_api == null) $identity_plus_api = identity_plus_create_api($options);
+	$new_identity = $identity_plus_api->register_service($_GET['identity-plus-register-intent'], "Default");
+	if(isset($new_identity->p12) && isset($new_identity->password)){
+		error_log("seeting new identity.. . ..  .......");
 		$options['cert-data'] = $new_identity->p12;
 		$options['cert-password'] = $new_identity->password;
 	}
