@@ -388,10 +388,6 @@ function idenity_plus_renew_service_agent_certificate(){
 	$new_identity = $identity_plus_api->issue_service_agent_identity(null, "Default");
 
 	if(isset($new_identity->p12) && isset($new_identity->password)){
-		error_log("----------<<<<<<<<<<<-------");
-		error_log($new_identity->password);
-		error_log("---------<<<<<<<<<<<<<-------");
-
 		$options['cert-data'] = $new_identity->p12;
 		$options['cert-password'] = $new_identity->password;
 	}
