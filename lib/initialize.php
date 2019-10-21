@@ -213,6 +213,18 @@ function identity_plus_obtain_user_profile($options, $identity_plus_api){
 		return $identity_plus_api;
 }
 
+/**
+ * Facilitate auto binding of the current user
+ */
+function auto_bind_current_user(){
+	if($identity_plus_api == null) $identity_plus_api = identity_plus_create_api($options);
+	
+	$now = time();
+	$your_date = strtotime(wp_get_current_user()->user_registered);
+	$days = ceil(abs($now - $your_date) / 86400);
+	$profile = $identity_plus_api->bind_local_user($_SESSION['identity-plus-anonymous-id'], wp_get_current_user()->ID, $days);
+	$_SESSION['identity-plus-user-profile'] = $profile;
+}
 
 /**
  * Post process the Identity + profile to make sure everything is in order in the database
@@ -228,14 +240,9 @@ function identity_plus_autologin($options, $identity_plus_api){
 		$profile = $_SESSION['identity-plus-user-profile'];
 			
 		// If user is logged in and the Identity + profile is not bound
+		// we are disabling this to allow for manual connect / disconnect
 		if(is_user_logged_in() && !isset($profile->local_user_name) && false){
-			if($identity_plus_api == null) $identity_plus_api = identity_plus_create_api($options);
-	
-			$now = time();
-			$your_date = strtotime(wp_get_current_user()->user_registered);
-			$days = ceil(abs($now - $your_date) / 86400);
-			$profile = $identity_plus_api->bind_local_user($_SESSION['identity-plus-anonymous-id'], wp_get_current_user()->ID, $days);
-			$_SESSION['identity-plus-user-profile'] = $profile;
+			auto_bind_current_user();
 		}
 			
 		// if no user is logged in but we have
@@ -392,12 +399,13 @@ function idenity_plus_issue_service_agent_certificate(){
 	if($identity_plus_api == null) $identity_plus_api = identity_plus_create_api($options);
 	$new_identity = $identity_plus_api->register_service($_GET['identity-plus-register-intent'], "Default");
 	if(isset($new_identity->p12) && isset($new_identity->password)){
-		error_log("seeting new identity.. . ..  .......");
 		$options['cert-data'] = $new_identity->p12;
 		$options['cert-password'] = $new_identity->password;
 	}
 
 	update_option( 'identity_plus_settings', $options);
+	auto_bind_current_user();
+	unset($_SESSION['identity-plus-user-profile']);
 }
 
 
