@@ -217,6 +217,7 @@ function identity_plus_obtain_user_profile($options, $identity_plus_api){
  * Facilitate auto binding of the current user
  */
 function auto_bind_current_user(){
+	$options = get_option( 'identity_plus_settings' );
 	if($identity_plus_api == null) $identity_plus_api = identity_plus_create_api($options);
 	
 	$now = time();
@@ -387,25 +388,38 @@ function idenity_plus_renew_service_agent_certificate(){
 	$new_identity = $identity_plus_api->issue_service_agent_identity(null, "Default");
 
 	if(isset($new_identity->p12) && isset($new_identity->password)){
+		error_log("----------<<<<<<<<<<<-------");
+		error_log($new_identity->password);
+		error_log("---------<<<<<<<<<<<<<-------");
+
 		$options['cert-data'] = $new_identity->p12;
 		$options['cert-password'] = $new_identity->password;
 	}
 
 	update_option( 'identity_plus_settings', $options);
+
+	$identity_plus_api == null;
+	unset($_SESSION['identity-plus-user-profile']);
+
+	auto_bind_current_user();
 }
 
 function idenity_plus_issue_service_agent_certificate(){
 	$options = get_option( 'identity_plus_settings' );
 	if($identity_plus_api == null) $identity_plus_api = identity_plus_create_api($options);
 	$new_identity = $identity_plus_api->register_service($_GET['identity-plus-register-intent'], "Default");
+
 	if(isset($new_identity->p12) && isset($new_identity->password)){
 		$options['cert-data'] = $new_identity->p12;
 		$options['cert-password'] = $new_identity->password;
 	}
 
 	update_option( 'identity_plus_settings', $options);
-	auto_bind_current_user();
+
+	$identity_plus_api == null;
 	unset($_SESSION['identity-plus-user-profile']);
+
+	auto_bind_current_user();
 }
 
 

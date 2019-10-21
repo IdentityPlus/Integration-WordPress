@@ -199,7 +199,7 @@ class Service_Agent_Identity extends API_Response{
 		$this->p12 = $data->{'p12'};
         $this->password = $data->{'password'};
         $this->certificate = $data->{'certificate'};
-        $this->private_key = $data->{'private_key'};
+        $this->private_key = $data->{'private-key'};
     }
 }
 

@@ -88,7 +88,10 @@ class Identity_Plus_API {
 	    	$this->chain = $cert_store['extracerts'];
 	    	$this->cert_details = openssl_x509_parse($this->cert);
     	}
-    	else return NULL;
+    	else{
+            error_log("Unable to load key material from pkcs12 store.");
+            return NULL;
+        } 
     }
     
     /**
