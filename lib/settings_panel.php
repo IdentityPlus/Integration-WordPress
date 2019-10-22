@@ -381,7 +381,7 @@ function identity_plus_add_idp_page(  ) {
 		if(!empty($options) && isset($options['cert-data'])){
             add_menu_page( 
                     'My IdentityPlus',
-                    'Device Identity', 
+                    'Device Login', 
                     'exist', 
                     'identity_plus_authentication', 
                     'identity_plus_authentication_page',
