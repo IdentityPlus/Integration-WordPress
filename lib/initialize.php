@@ -227,13 +227,13 @@ function auto_bind_current_user(){
 	$profile = $identity_plus_api->bind_local_user($_SESSION['identity-plus-anonymous-id'], wp_get_current_user()->ID, $days);
 	
 	// make sure we are have a local user id bound
-	if($profile->local_user_name){
+	if($profile->local_user_name != null){
 		add_user_meta($user_id, 'identity-plus-bound', $profile->local_user_name);
-
-		// update session data with fresh information after binding
-		$_SESSION['identity-plus-user-profile'] = $profile;
-		$_SESSION['identity-plus-anonymous-id'] = $profile->authorizing_certificate;
 	}
+
+	// update session data with fresh information after binding
+	$_SESSION['identity-plus-user-profile'] = $profile;
+	$_SESSION['identity-plus-anonymous-id'] = $profile->authorizing_certificate;
 }
 
 /**

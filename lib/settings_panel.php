@@ -402,7 +402,7 @@ function identity_plus_add_idp_page(  ) {
 
 function connect_header(){ ?>
 	<table><tr>
-			<th><img width="64" height="64" src="https://get.identity.plus/widgets/profile-picture"></th>
+			<th><img width="64" height="64" src="<?php echo plugins_url( 'img/unknown.jpg', __FILE__ ) ?>"></th>
 			<td><p class="identity-plus-hint">
 				Your Wordpress uses <a target="_blank" title="My Identity Plus Application" href="https://my.identity.plus"class="identity-plus-brand">identity<span>plus</span></a> to protect your account and your credentials.
 				You can now enjoy secure, passwordless authentication experience. Only devices owned and registered by you can access your Wordpress account.
