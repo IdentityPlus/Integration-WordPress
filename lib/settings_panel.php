@@ -16,7 +16,7 @@ add_action( 'admin_init', 'identity_plus_settings_init' );
 
 
 function identity_plus_add_admin_menu(  ) {
-		add_options_page( 'IdentityPlus Settings', 'Identity +', 'manage_options', 'identity_plus_network_of_trust', 'identity_plus_options_page' );
+		add_options_page( 'IdentityPlus Settings', 'Identity Plus', 'manage_options', 'identity_plus_network_of_trust', 'identity_plus_options_page' );
 }
 
 
@@ -54,7 +54,7 @@ function identity_plus_comments_render(  ) {
 function identity_plus_enforce_render(  ) {
 		$options = get_option( 'identity_plus_settings' );?>
 		<input type='checkbox' id='identity_plus_settings[enforce]' name='identity_plus_settings[enforce]' <?php isset($options['enforce']) ? checked( $options['enforce'], 1 ) : ""; ?> value='1'><label for='identity_plus_settings[enforce]'>Enforce Device Identity</label>
-		<p class="identity-plus-hint" style="max-width:640px; font-size:90%; color:rgba(0, 0, 0, 0.6); margin-bottom:10px; ">When Identity + certificate is enforced, resources starting with any of the enumerated filters will only 
+		<p class="identity-plus-hint" style="margin-bottom:10px;">When Identity Plus device id is enforced, resources starting with any of the enumerated filters will only 
 		be accessible from devices (desktop / laptop /mobile ) bearing a valid Identity + SSL Client Certificate. </p><?php
 }
 
@@ -94,22 +94,22 @@ function identity_plus_admin_styles(  ) {
 		?>
 		<style>
 				.identity-plus-main-fm{ float:left; overflow:hidden; clear:left;}
-				.identity-plus-main-fm-header {margin:0; background:url('<?php echo plugins_url( 'img/idp.svg', __FILE__ ) ?>') no-repeat top left; background-size:64px;}
-				.identity-plus-main-fm-header h1{padding-left:80px; padding-top:10px; margin-bottom:0; font-size:36px;font-weight:normal; }
-				.identity-plus-main-fm-header h5{padding-left:80px; font-size:20px; font-weight:300; padding-bottom:5px; padding-top:0; margin:15px 0px 0px 0px;}
-
+				.identity-plus-main-fm-header {margin:0; background:url('<?php echo plugins_url( 'img/idp.svg', __FILE__ ) ?>') no-repeat top left; background-size:50px; margin-bottom:30px;}
+				.identity-plus-main-fm-header h1{padding-left:60px; padding-top:20px; margin-bottom:0; font-size:30px;font-weight:normal; }
+				.identity-plus-main-fm-header h5{padding-left:60px; font-size:16px; font-weight:300; padding-bottom:0px; padding-top:0; margin:10px 0px 0px 0px;}
+				h5.identity-plus-title {font-weight:300; font-size:16px; line-height:130%; margin:0; max-width:640px; color:#909090;}
 				.identity-plus-main-fm p{margin:0;}
 				.identity-plus-main-fm th{padding-bottom:15px; padding-top:15px; color:#136a92;}
 				.identity-plus-main-fm td{padding-bottom:10px; padding-top:10px; }
-				.identity-plus-main-fm h2, .identity-plus-main-fm h3{border:1px solid rgba(0,0,0,0.1); border-bottom:0; background:rgba(0,0,0,0.05); float:left; clear:left; padding:8px 20px; margin-bottom:0px; color:#404040; font-weight:normal; border-top-left-radius:5px; border-top-right-radius:5px; margin-left:10px; margin-top:50px;}
+				.identity-plus-main-fm h2, .identity-plus-main-fm h3{border:1px solid #72777c; border-bottom:0; background:#72777c; float:left; clear:left; padding:8px 20px; margin-bottom:0px; color:#FFFFFF; font-weight:normal; border-top-left-radius:1px; border-top-right-radius:1px; margin-left:0px; margin-top:50px;}
 				.identity-plus-main-fm h4{border-bottom:1px solid #E0E0E0; color:#707070; padding-bottom:3px; padding-top:15px; margin-bottom:5px; font-weight:normal; font-size:16px;padding-top:0; margin-top:0; }
 				.identity-plus-main-fm .cert {max-width:600px; border-radius:3px; float:left; clear:both;}
 				.identity-plus-main-fm .cert p span{font-weight:bold;}
 				.identity-plus-main-fm .cert p{margin:0px; float:left; clear:left;}
 				.identity-plus-main-fm .cert {padding:10px; background:rgba(255, 255, 255, 0.6); border:1px solid rgba(0, 0, 0, 0.3);}
-				.identity-plus-separator{border-top:1px solid rgba(0,0,0,0.1); margin-top:0px; float:left; width:100%; clear:both; height:5px; margin-bottom:0px;}
-				.identity-plus-hint{float:left; clear:both; max-width:600px; color:#606060; font-size:14px; margin-top:0px; margin-bottom:10px;}
-                .identity-plus-brand span{color:#4292D3;}
+				.identity-plus-separator{border-top:1px solid #72777c; margin-top:0px; float:left; width:100%; clear:both; height:5px; margin-bottom:0px;}
+				.identity-plus-hint{float:left; clear:both; max-width:600px; color:#909090; font-size:12px; margin-top:0px; margin-bottom:10px;}
+                .identity-plus-brand span{color:#4292D3; margin-left:0.1em;}
                 .identity-plus-main-fm input, .identity-plus-main-fm textarea{ float:left; clear:left;}
                 .identity-plus-main-fm input[type="checkbox"]{ margin-top:0; margin-right:5px;}
                 .identity-plus-main-fm label{ float:left; font-weight:400;}
@@ -119,24 +119,34 @@ function identity_plus_admin_styles(  ) {
 				.identity-plus-main-fm a.toggle-off {font-size:16px; color:#202020; padding:5px 0px 5px 0px; margin-right:30px; cursor:pointer;}
 				.identity-plus-main-fm a.toggle-on {font-size:16px; color:#202020;  padding:5px 0px 5px 0px; margin-right:30px; cursor:pointer; border-bottom:1px solid #606060; display:inline-block;}
 				.circular_progress {transform: rotate(90deg);display: inline;}
-				div.holder-more {overflow: hidden;width: 128px;height: 128px;margin-top: 1px;margin-right: 30px;text-align: center;padding-left: 0; display: inline-block; float:left; clear:left; margin-right:30px;}
+				div.holder-more {overflow: hidden;width: 128px;height: 128px;margin-top: 1px;margin-right: 30px;text-align: center; padding-left: 0; display: inline-block; float:left; clear:left; margin-right:30px;}
 				div.holder-more p.overlay {position: relative;width: 100%;line-height: 120%;top: -93px;font-weight: 400; font-size:120%;}
 				div.holder-more p.overlay span {font-weight: 300;font-size: 90%;color: #606060;}
 				#wpfooter{position:static;}
 				.nodisp{display:none;}
 				.identity-plus-main-fm input[type=checkbox], .identity-plus-main-fm input[type=radio]{margin:0px 10px 5px 0px; float;left; clear:left; box-shadow:none;}
 				.identity-plus-main-fm input[type=text]{padding:5px; box-shadow:none;}
-				.identity-plus-main-fm textarea{margin:0px 10px 5px 0px; float:left; clear:left; margin-bottom:20px; border-radius:0px; box-shadow:none; padding:5px 10px;}
+				.identity-plus-main-fm textarea{margin:0px 10px 5px 0px; float:left; clear:left; margin-bottom:20px; border-radius:1px; border:1px solid #72777c; box-shadow:none; padding:5px 10px; background:rgba(0,0,0,0.05); font-family:monospace;}
+				.identity-plus-main-fm textarea:focus{box-shadow:none;}
 				.identity-plus-main-fm .submit{float:left; clear:left; margin-top:0px; padding:0px; height:32px;}
-				.identity-plus-main-fm .submit input[type="submit"]{text-decoration:none; background:#4292D3; color:#FFFFFF; display:inline-block; border-radius:3px; border:1px solid rgba(0,0,0,0.1); cursor:pointer; box-shadow:none; text-shadow:none; font-size:14px; padding:2px 18px; height:auto;}
-				.identity-plus-main-fm a.submit{text-decoration:none; background:#4292D3; color:#FFFFFF; display:inline-block; border-radius:3px; border:1px solid rgba(0,0,0,0.1); cursor:pointer; box-shadow:none; text-shadow:none; font-size:14px; padding:6px 18px; height:auto;}
+				.identity-plus-main-fm .submit input[type="submit"]{text-decoration:none; background:#4292D3; color:#FFFFFF; display:inline-block; border-radius:1px; border:1px solid rgba(0,0,0,0.1); cursor:pointer; box-shadow:none; text-shadow:none; font-size:14px; padding:3px 18px; height:auto;}
+				.identity-plus-main-fm a.submit{text-decoration:none; background:#4292D3; color:#FFFFFF; display:inline-block; border-radius:1px; border:1px solid rgba(0,0,0,0.1); cursor:pointer; box-shadow:none; text-shadow:none; font-size:14px; padding:8px 18px 6px 18px; height:auto;}
 		</style>
 		<?php 
 }
 
+function settings_header(){ ?>
+	<table><tr>
+			<td><h5 class="identity-plus-title">
+				Authenticate with your device and prevent unknown and malicious devices from accessing your Wordpress account. Great security at great convenience.
+			</h5></td>
+	</tr></table>
+<?php }
 
 function identity_plus_api_section_callback(  ) {
 	$problems = idp_problems(get_option( 'identity_plus_settings' ));
+
+	settings_header();
 
 	?>
 	
@@ -286,8 +296,8 @@ function identity_plus_admin_save_access(){
 function identity_plus_options_page(  ) { 
 		?>
 		<div class="identity-plus-main-fm-header">
-			<h1 class="identity-plus-brand">Identity<span>plus</span></h1>
-			<h5>man &amp; machine</h5>
+			<h1 class="identity-plus-brand">identity<span>plus</span></h1>
+			<h5>authenticate everything</h5>
 		</div>
 		
 		<?php 
@@ -385,10 +395,20 @@ function identity_plus_add_idp_page(  ) {
                     'exist', 
                     'identity_plus_authentication', 
                     'identity_plus_authentication_page',
-                    'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+PHN2ZyAgIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIgICB4bWxuczpjYz0iaHR0cDovL2NyZWF0aXZlY29tbW9ucy5vcmcvbnMjIiAgIHhtbG5zOnJkZj0iaHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyIgICB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgICB4bWxuczpzb2RpcG9kaT0iaHR0cDovL3NvZGlwb2RpLnNvdXJjZWZvcmdlLm5ldC9EVEQvc29kaXBvZGktMC5kdGQiICAgeG1sbnM6aW5rc2NhcGU9Imh0dHA6Ly93d3cuaW5rc2NhcGUub3JnL25hbWVzcGFjZXMvaW5rc2NhcGUiICAgdmVyc2lvbj0iMS4xIiAgIGlkPSJMYXllcl8xIiAgIHg9IjBweCIgICB5PSIwcHgiICAgd2lkdGg9IjEyOHB4IiAgIGhlaWdodD0iMTI4cHgiICAgdmlld0JveD0iMCAwIDEyOCAxMjgiICAgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgMTI4IDEyODsiICAgeG1sOnNwYWNlPSJwcmVzZXJ2ZSIgICBpbmtzY2FwZTp2ZXJzaW9uPSIwLjkxIHIxMzcyNSIgICBzb2RpcG9kaTpkb2NuYW1lPSJkYXJrLXBsdXMtc2ltcGxlLnN2ZyI+PG1ldGFkYXRhICAgICBpZD0ibWV0YWRhdGEzOSI+PHJkZjpSREY+PGNjOldvcmsgICAgICAgICByZGY6YWJvdXQ9IiI+PGRjOmZvcm1hdD5pbWFnZS9zdmcreG1sPC9kYzpmb3JtYXQ+PGRjOnR5cGUgICAgICAgICAgIHJkZjpyZXNvdXJjZT0iaHR0cDovL3B1cmwub3JnL2RjL2RjbWl0eXBlL1N0aWxsSW1hZ2UiIC8+PC9jYzpXb3JrPjwvcmRmOlJERj48L21ldGFkYXRhPjxkZWZzICAgICBpZD0iZGVmczM3IiAvPjxzb2RpcG9kaTpuYW1lZHZpZXcgICAgIHBhZ2Vjb2xvcj0iI2ZmZmZmZiIgICAgIGJvcmRlcmNvbG9yPSIjNjY2NjY2IiAgICAgYm9yZGVyb3BhY2l0eT0iMSIgICAgIG9iamVjdHRvbGVyYW5jZT0iMTAiICAgICBncmlkdG9sZXJhbmNlPSIxMCIgICAgIGd1aWRldG9sZXJhbmNlPSIxMCIgICAgIGlua3NjYXBlOnBhZ2VvcGFjaXR5PSIwIiAgICAgaW5rc2NhcGU6cGFnZXNoYWRvdz0iMiIgICAgIGlua3NjYXBlOndpbmRvdy13aWR0aD0iOTQ4IiAgICAgaW5rc2NhcGU6d2luZG93LWhlaWdodD0iNDgwIiAgICAgaWQ9Im5hbWVkdmlldzM1IiAgICAgc2hvd2dyaWQ9ImZhbHNlIiAgICAgaW5rc2NhcGU6em9vbT0iMS40ODk3NjUxIiAgICAgaW5rc2NhcGU6Y3g9IjEwNi45NzU5IiAgICAgaW5rc2NhcGU6Y3k9IjY0IiAgICAgaW5rc2NhcGU6d2luZG93LXg9IjEzMSIgICAgIGlua3NjYXBlOndpbmRvdy15PSI0NDAiICAgICBpbmtzY2FwZTp3aW5kb3ctbWF4aW1pemVkPSIwIiAgICAgaW5rc2NhcGU6Y3VycmVudC1sYXllcj0iZzMiIC8+PGcgICAgIGlkPSJnMyIgICAgIHN0eWxlPSJmaWxsOiNjY2NjY2MiPjxwYXRoICAgICAgIHN0eWxlPSJmaWxsOiNjY2NjY2MiICAgICAgIGQ9Im0gMCwwIDAsMTI4IDEyOCwwIDAsLTEyOCB6IG0gMTIuNjQwNjI1LDQwLjAxNzU3OCAxMS43MzYzMjgsMCAwLDkuNTcyMjY2IC0xMS43MzYzMjgsMCB6IG0gNDQuMDY0NDUzLC02IDExLjgwMjczNCwwIDAsNTcuMDE1NjI1IGMgLTguMDAxNzcsLTAuMzY2MTE5IC0xMi41Nzk4MTgsMC4zMjQzMTMgLTIzLjkwMDM5LDAuOTQ5MjE5IC00LjUyNDU0NSwwIC04LjI0MTM2MywtMS43OTIyOSAtMTEuMTQ4NDM4LC01LjM3Njk1MyAtMi45MDcwNzQsLTMuNjA2NTIyIC00LjM1OTM3NSwtOC4yMzkyNDYgLTQuMzU5Mzc1LC0xMy45MDAzOTEgMCwtNS42NjExNDUgMS40NTIzMDEsLTEwLjI4NDQ3OCA0LjM1OTM3NSwtMTMuODY5MTQgMi45MDcwNzUsLTMuNjA2NTIyIDYuNjIzODkzLC01LjQxMDE1NyAxMS4xNDg0MzgsLTUuNDEwMTU3IDE3LjE0MDM1NywxLjA2OTY5IDExLjA2MDU2NCw0LjM5NDExNCAxMi4wOTc2NTYsLTE5LjQwODIwMyB6IG0gMzUuNzM2MzI4LDE0LjkxNzk2OSA3LjgwNDY4NCwwIDAsMTcuMTc5Njg3IDE3LjExMzI5LDAgMCw3LjczNjMyOCAtMTcuMTEzMjksMCAwLDE3LjE4MTY0MSAtNy44MDQ2ODQsMCAwLC0xNy4xODE2NDEgLTE3LjExMzI4MSwwIDAsLTcuNzM2MzI4IDE3LjExMzI4MSwwIHogbSAtNzkuODAwNzgxLDUuMzc2OTUzIDExLjczNjMyOCwwIDAsMzYuNzIwNzAzIC0xMS43MzYzMjgsMCB6IG0gMzYuMzI2MTcyLDcuNjM4NjcyIGMgLTIuNDkxNzc4LDAgLTQuNDAzMDA4LDAuOTE3ODU5IC01LjczNjMyOCwyLjc1MzkwNiAtMS4zMTE0NjIsMS44MzYwNDcgLTEuOTY4NzUsNC41MDI3NjcgLTEuOTY4NzUsOCAwLDMuNDk3MjMzIDAuNjU3Mjg4LDYuMTYzOTUzIDEuOTY4NzUsOCAxLjMzMzMyLDEuODM2MDQ3IDMuMjQ0NTUsMi43NTM5MDYgNS43MzYzMjgsMi43NTM5MDYgMi41MTM2MzYsMCA0LjQyNjgxOSwtMC45MTc4NTkgNS43MzgyODEsLTIuNzUzOTA2IDEuMzMzMzIsLTEuODM2MDQ3IDIsLTQuNTAyNzY3IDIsLTggMCwtMy40OTcyMzMgLTAuNjY2NjgsLTYuMTYzOTUzIC0yLC04IC0xLjMxMTQ2MiwtMS44MzYwNDcgLTMuMjI0NjQ1LC0yLjc1MzkwNiAtNS43MzgyODEsLTIuNzUzOTA2IHoiICAgICAgIGlkPSJyZWN0NSIgICAgICAgaW5rc2NhcGU6Y29ubmVjdG9yLWN1cnZhdHVyZT0iMCIgICAgICAgc29kaXBvZGk6bm9kZXR5cGVzPSJjY2NjY2NjY2NjY2NjY2NzY2NjY2NjY2NjY2NjY2NjY2NjY2Njc2NzY3Njc2NzIiAvPjwvZz48ZyAgICAgaWQ9ImcyNSIgLz48ZyAgICAgaWQ9ImcyNyIgLz48ZyAgICAgaWQ9ImcyOSIgLz48ZyAgICAgaWQ9ImczMSIgLz48ZyAgICAgaWQ9ImczMyIgLz48L3N2Zz4='
+                    'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCFET0NUWVBFIHN2ZyBQVUJMSUMgIi0vL1czQy8vRFREIFNWRyAxLjEvL0VOIiAiaHR0cDovL3d3dy53My5vcmcvR3JhcGhpY3MvU1ZHLzEuMS9EVEQvc3ZnMTEuZHRkIj4KPHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCIKCSB3aWR0aD0iNjQwcHgiIGhlaWdodD0iNjQwcHgiIHZpZXdCb3g9IjAgMCA2NDAgNjQwIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCA2NDAgNjQwIiB4bWw6c3BhY2U9InByZXNlcnZlIj4KPGc+PHBhdGggZmlsbD0iIzQ1OTZDRSIgZD0iTTI0NC44NTcsNTg4LjAyN0gxMDcuODMxTDM5NS41MTMsMy40MmgxMzYuNjU2TDI0NC44NTcsNTg4LjAyN3oiLz48L2c+Cjwvc3ZnPgo='
             );
         }
 }
+
+function connect_header(){ ?>
+	<table><tr>
+			<th><img width="64" height="64" src="https://get.identity.plus/widgets/profile-picture"></th>
+			<td><p class="identity-plus-hint">
+				Your Wordpress uses <a target="_blank" title="My Identity Plus Application" href="https://my.identity.plus"class="identity-plus-brand">identity<span>plus</span></a> to protect your account and your credentials.
+				You can now enjoy secure, passwordless authentication experience. Only devices owned and registered by you can access your Wordpress account.
+			</p></td>
+	</tr></table>
+<?php }
 
 function identity_plus_idp_page(  ) {
         $user_id = get_current_user_id();
@@ -402,14 +422,10 @@ function identity_plus_idp_page(  ) {
         $options = get_option( 'identity_plus_settings' );
 
         ?>
-                <?php if(get_user_meta($user_id, 'identity-plus-bound', true)){ ?>
-                    <table><tr>
-	                        <th><img width="64" height="64" src="https://get.identity.plus/widgets/profile-picture"></th>
-                   	    	<td><p class="identity-plus-hint">
-                                Your Wordpress uses <a target="_blank" title="My Identity Plus Application" href="https://my.identity.plus"><span>identity</span></a> to protect your account and your credentials.
-                                You can now enjoy secure password-less experience. Only devices owned and registered by you can access your Wordpress account.
-                            </p></td>
-                    </tr></table>
+                <?php if(get_user_meta($user_id, 'identity-plus-bound', true)){ 
+					connect_header(); 
+
+					?>
 
                     <h2>Disconnect</h2><p class="identity-plus-separator" style="padding-top:5px;"></p>
                     <?php if(isset($options['enforce']) && $options['enforce'] == 1 ){ ?>
@@ -421,31 +437,20 @@ function identity_plus_idp_page(  ) {
                         <input type="submit" id="identity_plus_disconnect" style="display:none; background:#900000; color:#FFFFFF; padding:8px 18px 6px 18px; border-radius:3px; border:1px solid rgba(0,0,0,0.1);" value="Disconnect">
                     <?php } ?>
 
-                <?php } else if(isset($_SESSION['identity-plus-user-profile'])){ ?>
-                    <table><tr>
-                            <th><img width="64" height="64" src="https://get.identity.plus/widgets/profile-picture"></th>
-                   	    	<td>
-                                <p class="identity-plus-hint">
-                                    Your Wordpress uses <a target="_blank" title="My Identity Plus Application" href="https://identity.plus"><span>identity</span></a> to protect your account and your credentials by
-                                    only allowing devices owned and registered by you to access your Wordpress account.
-                                </p>
-                            </td>
-                    </tr></table>
+                <?php } else if(isset($_SESSION['identity-plus-user-profile'])){ 
+					connect_header();
+
+					?>
                     
                     <p class="identity-plus-hint" >Connect your identity<span class="identity-plus-brand">plus</span> account for secure, password-less login experience.</p>
                     <input type="hidden" name="action" value="identity_plus_connect">
                     <input type="submit" id="identity_plus_disconnect" style="background:#4292D3; color:#FFFFFF; padding:8px 18px 6px 18px; border-radius:3px; border:1px solid rgba(0,0,0,0.1); cursor:pointer; margin-top:10px;" value="Connect">
-                <?php } else { ?>
-                    <table><tr>
-                   	    	<td>
-                                <p class="identity-plus-hint">
-                                    Your Wordpress uses <a target="_blank" title="My Identity Plus Application" href="https://identity.plus"><span>identity</span></a> to protect your account and your credentials by
-                                    only allowing devices owned and registered by you to access your Wordpress account.
-                                </p>
-                            </td>
-                    </tr></table>
+                <?php } else { 
+					connect_header();
+
+					?>
                     
-                    <p class="identity-plus-hint" >Get your free <span class="identity-plus-brand">plus</span> account for secure, password-less login experience.</p>
+                    <p class="identity-plus-hint" >Get your free identity<span class="identity-plus-brand">plus</span> account for secure, password-less login experience.</p>
                     <input type="hidden" name="action" value="identity_plus_connect">
                     <input type="submit" id="identity_plus_disconnect" style="background:#303030; color:#62B2F3; padding:7px 15px 5px 15px; border-radius:2px; border:1px solid #000000" value="Get Id+">
                 <?php } ?>
@@ -456,8 +461,8 @@ function identity_plus_idp_page(  ) {
 function identity_plus_authentication_page(  ) {
 		?>
 		<div class="identity-plus-main-fm-header">
-			<h1 class="identity-plus-brand">Identity<span>plus</span></h1>
-			<h5>man &amp; machine</h5>
+			<h1 class="identity-plus-brand">identity<span>plus</span></h1>
+			<h5>authenticate everything</h5>
 		</div>
 		<form class="identity-plus-main-fm" method="post" action="<?php echo admin_url( 'admin.php' ); ?>">
                 <?php wp_nonce_field('my_delete_action'); ?>
