@@ -22,7 +22,10 @@ function identity_plus_add_admin_menu(  ) {
 
 
 function identity_plus_settings_init(  ) {
-        if(!function_exists("curl_init")) add_settings_error('identity_plus_settings', 'identity-plus-curl-error', "Curl extension is not installed on the server! Identity + needs php-curl extension to work. <br>(for Ubuntu type: sudo apt-get install php-curl)", "error");
+        if(!function_exists("curl_init")){
+			add_settings_error('identity_plus_settings', 'identity-plus-curl-error', "Curl extension is not installed on the server! Identity + needs php-curl extension to work. <br>(for Ubuntu type: sudo apt-get install php-curl)", "error");
+		}
+
         $problems = idp_problems(get_option( 'identity_plus_settings' ));
 		if($problems) add_settings_error('identity_plus_settings', 'identity-plus-api-certificate-error', $problems, "error");
 }
@@ -94,9 +97,9 @@ function identity_plus_admin_styles(  ) {
 		?>
 		<style>
 				.identity-plus-main-fm{ float:left; overflow:hidden; clear:left;}
-				.identity-plus-main-fm-header {margin:0; background:url('<?php echo plugins_url( 'img/idp.svg', __FILE__ ) ?>') no-repeat top left; background-size:50px; margin-bottom:30px;}
-				.identity-plus-main-fm-header h1{padding-left:60px; padding-top:20px; margin-bottom:0; font-size:30px;font-weight:normal; }
-				.identity-plus-main-fm-header h5{padding-left:60px; font-size:16px; font-weight:300; padding-bottom:0px; padding-top:0; margin:10px 0px 0px 0px;}
+				.identity-plus-main-fm-header {margin:0; background:url('<?php echo plugins_url( 'img/idp.svg', __FILE__ ) ?>') no-repeat top left; background-size:42px; margin-bottom:30px;}
+				.identity-plus-main-fm-header h1{padding-left:50px; padding-top:20px; margin-bottom:0; font-size:30px;font-weight:normal; }
+				.identity-plus-main-fm-header h5{padding-left:50px; font-size:14px; font-weight:300; padding-bottom:0px; padding-top:0; margin:10px 0px 0px 0px;}
 				h5.identity-plus-title {font-weight:300; font-size:16px; line-height:130%; margin:0; max-width:640px; color:#909090;}
 				.identity-plus-main-fm p{margin:0;}
 				.identity-plus-main-fm th{padding-bottom:15px; padding-top:15px; color:#136a92;}
@@ -131,6 +134,7 @@ function identity_plus_admin_styles(  ) {
 				.identity-plus-main-fm .submit{float:left; clear:left; margin-top:0px; padding:0px; height:32px;}
 				.identity-plus-main-fm .submit input[type="submit"]{text-decoration:none; background:#4292D3; color:#FFFFFF; display:inline-block; border-radius:1px; border:1px solid rgba(0,0,0,0.1); cursor:pointer; box-shadow:none; text-shadow:none; font-size:14px; padding:3px 18px; height:auto;}
 				.identity-plus-main-fm a.submit{text-decoration:none; background:#4292D3; color:#FFFFFF; display:inline-block; border-radius:1px; border:1px solid rgba(0,0,0,0.1); cursor:pointer; box-shadow:none; text-shadow:none; font-size:14px; padding:8px 18px 6px 18px; height:auto;}
+				.wp-core-ui .notice.is-dismissible{margin-left:0;}
 		</style>
 		<?php 
 }

@@ -67,6 +67,7 @@ function idp_add_user_id_column($columns) {
     return $columns;
 }
  
+
 function idp_show_user_id_column_content($value, $column_name, $user_id) {
     $user = get_userdata( $user_id );
 	if ( 'user_id' == $column_name ){
@@ -84,6 +85,9 @@ function identity_plus_initialize(){
 			error_log("Curl extension is not installed on the server! Identity + needs php5-curl extension to work. <br>(for Ubuntu type: sudo apt-get install php5-curl)");
 			return;
 		}
+
+		// attempt to start session
+		session_start();
 	
 		// make sure we have everything that is needed to
 		// run Identity + (certificate, password)
@@ -95,8 +99,6 @@ function identity_plus_initialize(){
 
 		// if we have Identity + then we can start using it
 		if(!idp_problems($options)){
-			// attempt to start session
-			session_start();
 			$identity_plus_api = null;
 
 			// if returning from Identity + with information payload
