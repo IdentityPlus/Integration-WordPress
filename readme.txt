@@ -2,8 +2,8 @@
 Contributors: shfarr
 Tags: authentication, security, 2factor, comments, spam, VPN, tls authentication, SSL client certificate, device identity, identity in the browser, two factor, login, two step authentication, password, admin, mobile, multi-factor, android, iphone, sso, strong two-step verification
 Requires at least: 3.9
-Tested up to: 4.9.8
-Stable tag: 1.0
+Tested up to: 5.2.4
+Stable tag: 2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -77,9 +77,22 @@ Hopefully you will not encounter difficulties during the installation process bu
 = EXTREME MEASURES =
 1. If the certificate in your browser expires, or you manually revoke it you will not be able to access your blog. This conflict needs to be resolved on Identityplus. Simply issue a new certificate for your browser, install it and all will be back to normal.
 2. You lose your device and it's connected to your Identityplus. Take your other device, go to Identityplus and revoke the certificate of your lost device. This will revoke access to any Identityplus bound account, so you are safe.
-3. You locked your self out of your Wordpress. No problem. You need to go to your Worpress back-end, (access the files). In your wp-content/uploads/.../, you will find the certificate file you uploaded (a *.p12 keystore file). Delete the file. This will disable the plugin, and you can use your regular wordpress login to access your back-end.
+3. You locked your self out of your Wordpress. No problem.
+
+    a. You need to go to your Worpress back-end, (access the files). 
+    b. In your wp-content/plugins/identity-plus/lib folder, edit the initialize.php file. 
+    c. Uncomment this line: // if(True) return "Manually disabled ...";
+    d. Access your Wordpress using user name and password
+    e. Uninstall the plugin and perform a fresh install
 
 == Changelog == 
+
+== 2.0 ==
+This is a major update. We recommend deactivating the "Enforce Identity + Device Certificate" flag for safety during certificate update.
+
+Added automatic & one click API certificate renewal. This grately improves user experience for maitaining the Identity Plus plugin and prevents accidental certificate expiration, which may cause service outage.
+Integrated the new service installation proces via automated wizard. It is no longer needed for the user to log into identity plus account and issue certificate before installation. Using the mobile application, or registered device, you can now onboard the service, issue the certificate and activate identity plus in one short flow.
+We've also moved the certificate storage from file to the database for enhanced security.
 
 == 1.6.4 ==
 Minor bug fix

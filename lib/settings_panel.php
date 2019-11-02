@@ -211,7 +211,7 @@ function identity_plus_api_section_callback(  ) {
 		<form id="renew-fm" class="identity-plus-main-fm" action="admin-post.php" method='post' enctype="multipart/form-data">
 				<div>
 					<p class="identity-plus-hint" style="font-size:13px; margin-bottom:5px;">Click the button below to add certify your ownership of this Wordpress instance.</p>
-					<a class="submit" href="<?php echo("https://register." . Identity_Plus_API::HOME . "/?url=" . urlencode((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]"));?>" target="_blank">Certify Ownership</a>
+					<a class="submit" href="<?php echo("https://register." . Identity_Plus_API::HOME . "/?service=" . get_bloginfo('name') . "&url=" . urlencode((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]"));?>" target="_blank">Certify Ownership</a>
 				</div>
 		</form>
 	<?php } else { ?>

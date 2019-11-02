@@ -23,7 +23,8 @@ add_filter('manage_users_columns', 'idp_add_user_id_column');
 add_action('manage_users_custom_column',  'idp_show_user_id_column_content', 10, 3);
 
 function idp_problems($options){
-	
+	// if(True) return "Manually disabled ...";
+
     if(empty($options) || !isset($options['cert-data']) || !isset($options['cert-password'])){
         return "API Certificate is missing! Please follow the steps below to prove ownership of this domain and activate the Identity Plus services.";
     }
