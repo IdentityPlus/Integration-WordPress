@@ -379,10 +379,12 @@ class Intent_Reference extends API_Response{
 	 * The reference value
 	 */
 	public $value;
+	public $challenge;
 
 	public function __construct($data){
 		parent::__construct($data);
 		$this->value = $data->{'value'};
+		$this->challenge = $data->{'challenge'};
 	}
 }
 
@@ -400,6 +402,9 @@ class Intent_Type {
 
     /* request this device to be certified and bind local user to it. Connect device or sign up for identity plus if necessary. The operation will be performed under the brand of the domain */
     const bind = 'bind'; 
+
+	/* attempts to assume ownership of a online service. Identity plus will supply a challenge which it assumes will be available at the domain whose onwership is being assumed */
+	const assume_ownership = 'assume-ownership'; 
 }
 
 class Intent extends API_Request{
@@ -425,14 +430,16 @@ class Intent extends API_Request{
 	public $name;
 	public $email_address;
 	public $phone_number;
+	public $service_name;
 
-	public function __construct($type, $local_user_name, $name, $email_address, $phone_number, $return_url) {
+	public function __construct($type, $local_user_name, $name, $email_address, $phone_number, $return_url, $service_name = '') {
 	    $this->type = $type;
 	    $this->local_user_name = $local_user_name;
 	    $this->return_url = $return_url;
 	    $this->email_address = $email_address;
 	    $this->phone_number = $phone_number;
 	    $this->name = $name;
+		$this->service_name = $service_name;
 	}
 }
 

@@ -16,7 +16,7 @@ add_action( 'admin_init', 'identity_plus_settings_init' );
 
 
 function identity_plus_add_admin_menu(  ) {
-		add_options_page( 'IdentityPlus Settings', 'Identity Plus', 'manage_options', 'identity_plus_network_of_trust', 'identity_plus_options_page' );
+		add_options_page( 'IdentityPlus Settings', 'Identity Plus', 'manage_options', 'identity_plus', 'identity_plus_options_page' );
 }
 
 
@@ -209,9 +209,10 @@ function identity_plus_api_section_callback(  ) {
 
 	<?php if(empty($options) || !isset($options['cert-data'])){ ?>
 		<form id="renew-fm" class="identity-plus-main-fm" action="admin-post.php" method='post' enctype="multipart/form-data">
+				<input type="hidden" name="action" value="certify_ownership">
 				<div>
 					<p class="identity-plus-hint" style="font-size:13px; margin-bottom:5px;">Click the button below to add certify your ownership of this Wordpress instance.</p>
-					<a class="submit" href="<?php echo("https://register." . Identity_Plus_API::HOME . "/?service=" . get_bloginfo('name') . "&url=" . urlencode((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]"));?>" target="_blank">Certify Ownership</a>
+					<?php submit_button("Certify Ownership"); ?>
 				</div>
 		</form>
 	<?php } else { ?>
@@ -344,7 +345,28 @@ function identity_plus_admin_renew_certificate(){
 	die("Certificate renewed.");
 }
 
+add_action( 'admin_post_certify_ownership', 'identity_plus_admin_certify_ownership');
+function identity_plus_admin_certify_ownership(){
+	$options = get_option( 'identity_plus_settings' );
 
+	// request a registration intent and receive a reference and a challenge
+	// identity plus will make an ouut of band call to the server with the intent to validate that challenge
+	if($identity_plus_api == null) $identity_plus_api = identity_plus_create_api($options);
+	$intent_ref = $identity_plus_api->issue_register_intent();
+
+	error_log("intent----->".$intent_ref->value);
+
+	// store the challenge in the database so we can serve it later
+	$options['registeration-reference'] = $intent_ref->value;
+	$options['challenge'] = $intent_ref->challenge;
+
+	update_option( 'identity_plus_settings', $options);
+
+	// redirect to authorization page
+	wp_redirect( "https://register." . Identity_Plus_API::HOME . '/' . $intent_ref->value, 302, 'WordPress' );
+
+	exit();
+}
 # -------------------------- Id + Menu Page
 
 add_action( 'admin_action_identity_plus_connect', 'identity_plus_connect');
@@ -357,7 +379,7 @@ function identity_plus_connect(){
 		$intent = $identity_plus_api->create_intent(Intent_Type::bind, $user_id, $user_info->user_firstname . ' ' . $user_info->user_lastname, $user_info->user_email, '', $_SERVER['HTTP_REFERER'] . '&bind=true');
 		unset($_SESSION['identity-plus-user-profile']);
 		unset($_SESSION['identity-plus-anonymous-id']);
-		wp_redirect(Identity_Plus_API::validation_endpoint.'/' . $intent->value);
+		wp_redirect("https://signon." . Identity_Plus_API::HOME . '/' . $intent->value);
 
         exit();
 }
@@ -433,7 +455,7 @@ function identity_plus_idp_page(  ) {
 
                     <h2>Disconnect</h2><p class="identity-plus-separator" style="padding-top:5px;"></p>
                     <?php if(isset($options['enforce']) && $options['enforce'] == 1 ){ ?>
-                        <p class="identity-plus-hint" >Your <a href="<?php echo admin_url('options-general.php?page=identity_plus_network_of_trust'); ?>">identityplus settings</a> only allow admin access from certified devices. Disconnect is disabled as you would lock yourself out from admin section.</p>
+                        <p class="identity-plus-hint" >Your <a href="<?php echo admin_url('options-general.php?page=identity_plus'); ?>">identityplus settings</a> only allow admin access from certified devices. Disconnect is disabled as you would lock yourself out from admin section.</p>
                     <?php } else { ?>
                         <p class="identity-plus-hint" >By disconnecting your identityplus account from the local account, you will lose the ability to sign in via device id. Are you sure?</p>
                         <input type="hidden" name="action" value="identity_plus_disconnect">

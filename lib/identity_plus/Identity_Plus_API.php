@@ -65,8 +65,6 @@ use identity_plus\api\communication\Service_Agent_Identity;
 class Identity_Plus_API {
 	const HOME = "identity.plus";
 	// const HOME = "local.stefanfarr.identityplus.app";
-    const api_endpoint = "https://api." . self::HOME . "/v1";
-	const validation_endpoint = "https://signon." . self::HOME;
 	
     public $cert_details;
     private $private_key;
@@ -112,7 +110,7 @@ class Identity_Plus_API {
     	}
 
         $intent = $this->create_intent(Intent_Type::discover, NULL, NULL, NULL, NULL, $return_url);
-        return self::validation_endpoint.'/' . $intent->value;
+        return "https://signon." . self::HOME . '/' . $intent->value;
     }
     
     /**
@@ -133,7 +131,7 @@ class Identity_Plus_API {
     	}
 
         $intent = $this->create_intent(Intent_Type::discover, NULL, NULL, NULL, NULL, $return_url);
-        return self::validation_endpoint.'/' . $intent->value;
+        return "https://signon." . self::HOME . '/' . $intent->value;
     }
 
     /**
@@ -160,10 +158,10 @@ class Identity_Plus_API {
             "args" => $args
         );
         
-        $call = curl_init(self::validation_endpoint . "/api/v1");
+        $call = curl_init("https://signon." . self::HOME . "/api/v1");
         
     	// curl_setopt($call, CURLOPT_VERBOSE, true);
-    	curl_setopt($call, CURLOPT_URL, self::validation_endpoint . "/api/v1");
+    	curl_setopt($call, CURLOPT_URL, "https://signon." . self::HOME . "/api/v1");
   		curl_setopt($call, CURLOPT_CUSTOMREQUEST, "POST");
     	curl_setopt($call, CURLOPT_POSTFIELDS, json_encode($request)); 
     	curl_setopt($call, CURLOPT_RETURNTRANSFER, true);
@@ -176,6 +174,30 @@ class Identity_Plus_API {
     	curl_close ($call);
     	
         return self::decode(json_decode($result));
+    }
+
+    public function issue_register_intent(){
+        $user_id = get_current_user_id();
+		$user_info = get_userdata($user_id);
+
+    	$args = new Intent(Intent_Type::assume_ownership, $user_id, $user_info->user_firstname . ' ' . $user_info->user_lastname, $user_info->user_email, '', admin_url('options-general.php?page=identity_plus'), get_bloginfo('name'));
+
+        $call = curl_init("https://signon." . self::HOME . "/api/v1");
+        
+    	// curl_setopt($call, CURLOPT_VERBOSE, true);
+    	curl_setopt($call, CURLOPT_URL, "https://signon." . self::HOME . "/api/v1");
+  		curl_setopt($call, CURLOPT_CUSTOMREQUEST, "POST");
+    	curl_setopt($call, CURLOPT_POSTFIELDS, '{"operation":"issue-service-registration-intent", "args":'.$args->to_json().'}'); 
+    	curl_setopt($call, CURLOPT_RETURNTRANSFER, true);
+        
+        curl_setopt($call, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($call, CURLOPT_SSL_VERIFYHOST, false);
+    	
+    	$result = curl_exec($call);
+    	    	
+    	curl_close ($call);
+    	
+        return json_decode($result)->result;
     }
    
     /**
@@ -314,10 +336,10 @@ class Identity_Plus_API {
         if($this->chain) foreach ($this->chain as $key => $value) fwrite($temp_cert, $value);
 
     	
-    	$call = curl_init(self::api_endpoint);
+    	$call = curl_init("https://api." . self::HOME . "/v1");
     	
     	if($debug) curl_setopt($call, CURLOPT_VERBOSE, true);
-    	curl_setopt($call, CURLOPT_URL, self::api_endpoint);
+    	curl_setopt($call, CURLOPT_URL, "https://api." . self::HOME . "/v1");
     	curl_setopt($call, CURLOPT_SSLKEY, stream_get_meta_data($temp_pkey)['uri']);
   		curl_setopt($call, CURLOPT_SSLKEYPASSWD, $temp_pass);
     	curl_setopt($call, CURLOPT_SSLCERT, stream_get_meta_data($temp_cert)['uri']);

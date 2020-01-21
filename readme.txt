@@ -3,7 +3,7 @@ Contributors: shfarr
 Tags: authentication, security, 2factor, comments, spam, VPN, tls authentication, SSL client certificate, device identity, identity in the browser, two factor, login, two step authentication, password, admin, mobile, multi-factor, android, iphone, sso, strong two-step verification
 Requires at least: 3.9
 Tested up to: 5.2.4
-Stable tag: 2.0
+Stable tag: 2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -86,6 +86,9 @@ Hopefully you will not encounter difficulties during the installation process bu
     e. Uninstall the plugin and perform a fresh install
 
 == Changelog == 
+
+== 2.1 ==
+We've replaced the necessity to validate the domain with an uploaded file with an automatic callback to achieve even less friction when you install the plug in.
 
 == 2.0 ==
 This is a major update. We recommend deactivating the "Enforce Identity + Device Certificate" flag for safety during certificate update.

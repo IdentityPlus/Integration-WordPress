@@ -23,8 +23,7 @@ add_filter('manage_users_columns', 'idp_add_user_id_column');
 add_action('manage_users_custom_column',  'idp_show_user_id_column_content', 10, 3);
 
 function idp_problems($options){
-	// if(True) return "Manually disabled ...";
-
+	
     if(empty($options) || !isset($options['cert-data']) || !isset($options['cert-password'])){
         return "API Certificate is missing! Please follow the steps below to prove ownership of this domain and activate the Identity Plus services.";
     }
@@ -68,7 +67,6 @@ function idp_add_user_id_column($columns) {
     return $columns;
 }
  
-
 function idp_show_user_id_column_content($value, $column_name, $user_id) {
     $user = get_userdata( $user_id );
 	if ( 'user_id' == $column_name ){
@@ -86,13 +84,22 @@ function identity_plus_initialize(){
 			error_log("Curl extension is not installed on the server! Identity + needs php5-curl extension to work. <br>(for Ubuntu type: sudo apt-get install php5-curl)");
 			return;
 		}
-
-		// attempt to start session
-		session_start();
 	
 		// make sure we have everything that is needed to
 		// run Identity + (certificate, password)
 		$options = get_option( 'identity_plus_settings' );
+
+		if($_GET['identity-plus-register-challenge']){
+			if($_GET['identity-plus-register-challenge'] == $options['registeration-reference']){
+				echo $options['challenge'];
+				exit();
+			}
+			else{
+				echo "no such intent";
+				exit();
+			}
+		}
+	
 
 		if($_GET['identity-plus-register-intent']){
 			idenity_plus_issue_service_agent_certificate();
@@ -100,6 +107,8 @@ function identity_plus_initialize(){
 
 		// if we have Identity + then we can start using it
 		if(!idp_problems($options)){
+			// attempt to start session
+			session_start();
 			$identity_plus_api = null;
 
 			// if returning from Identity + with information payload

@@ -1,11 +1,11 @@
 <?php
 
 /*
-   Plugin Name: Identity + 
+   Plugin Name: Identity Plus 
    Plugin URI: https://wordpress.org/plugins/identity-plus
-   Description: Connect your WordPress with Identity + and enable invisible 2 factor authentication, secured SSO, SSL Client Certificate based access on select pages and join the Identity + network of trust where devices and people are anonymousely rated based on how they behave. 
-   Version: 1.6.4
-   Author: Identity +
+   Description: Connect your WordPress with Identity Plus and enable invisible 2 factor authentication, secured SSO, SSL Client Certificate based access on select pages and join the Identity Plus network of trust where devices and people are anonymousely rated based on how they behave. 
+   Version: 2.1
+   Author: Identity Plus Inc.
    Author URI: http://identity.plus
    License: GPL2
 */
@@ -25,7 +25,7 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
- Copyright 2016 Identity +
+ Copyright 2016 Identity Plus Inc.
  */
 if (!defined('ABSPATH')){
 	error_log("File \"".__FILE__."\" was called directly. ");
