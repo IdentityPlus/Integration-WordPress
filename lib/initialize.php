@@ -25,7 +25,7 @@ add_action('manage_users_custom_column',  'idp_show_user_id_column_content', 10,
 function idp_problems($options){
 	
     if(empty($options) || !isset($options['cert-data']) || !isset($options['cert-password'])){
-        return "API Certificate is missing! Please follow the steps below to prove ownership of this domain and activate the Identity Plus services.";
+        return 'Identity Plus is not yet fully configured!<br>Please proceed to the <a href="?page=identity_plus">settings panel</a> to finalize the configuration.';
     }
 
 	$cert_store = array();
@@ -81,7 +81,7 @@ function idp_show_user_id_column_content($value, $column_name, $user_id) {
 
 function identity_plus_initialize(){
 		if(!function_exists("curl_init")){
-			error_log("Curl extension is not installed on the server! Identity + needs php5-curl extension to work. <br>(for Ubuntu type: sudo apt-get install php5-curl)");
+			error_log("Curl extension is not installed on the server! Identity Plus needs php7-curl extension to work. <br>(for Ubuntu type: sudo apt-get install php7-curl)");
 			return;
 		}
 	
@@ -186,6 +186,15 @@ function identity_plus_initialize(){
 			}
 	
 		} // end idp_on if
+		else if($_SERVER['REQUEST_URI'] != '/wp-admin/options-general.php?page=identity_plus'){
+			session_start();
+			if($_SESSION['identity-plus-notified-of-errors'] != "true"){
+				// once per session redirect to identity plus settings page
+				$_SESSION['identity-plus-notified-of-errors'] = "true";
+				wp_redirect('/wp-admin/options-general.php?page=identity_plus');
+				exit();
+			}
+		}
 }
 
 
@@ -379,12 +388,7 @@ function identity_plus_add_footer($admin = false) {
  * Add style for identity + cross validation widget
  */
 function identity_pluss_cf_frame_style(){
-		?>
-		<style>
-				.identity-plus-cf{border:0px; width:100%; height:110px; overflow-x:hidden; overflow-y:hidden; border-top:1px solid #000000;}
-				@media screen and (max-width: 700px){ .identity-plus-cf{height:210px; overflow-x:hidden; overflow-y:hidden;	}}
-		</style>
-		<?php 
+		?><?php 
 }
 
 

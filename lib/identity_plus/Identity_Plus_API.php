@@ -63,8 +63,8 @@ use identity_plus\api\communication\Service_Agent_Identity;
  * @author Stefan Harsan Farr
  */
 class Identity_Plus_API {
-	const HOME = "identity.plus";
-	// const HOME = "local.stefanfarr.identityplus.app";
+	// const HOME = "identity.plus";
+	const HOME = "local.stefanfarr.identityplus.app";
 	
     public $cert_details;
     private $private_key;
@@ -383,7 +383,7 @@ class Identity_Plus_API {
      * @param unknown A response Object.
      */
 	public static function decode($data){
-        error_log('------------------\n'.json_encode($data).'------------------\n');
+        // error_log('------------------\n'.json_encode($data).'------------------\n');
         
 		if(property_exists($data, 'Identity-Profile')) return new Identity_Profile($data->{'Identity-Profile'});
 		else if(property_exists($data, 'Reference-Number')) return new Reference_Number($data->{'Reference-Number'});

@@ -96,11 +96,11 @@ function identity_plus_settings_section_callback(  ) {
 function identity_plus_admin_styles(  ) {
 		?>
 		<style>
-				.identity-plus-main-fm{ float:left; overflow:hidden; clear:left;}
+				.identity-plus-main-fm{ float:left; overflow:hidden; clear:left; margin-bottom:20px;}
 				.identity-plus-main-fm-header {margin:0; background:url('<?php echo plugins_url( 'img/idp.svg', __FILE__ ) ?>') no-repeat top left; background-size:42px; margin-bottom:30px;}
 				.identity-plus-main-fm-header h1{padding-left:50px; padding-top:20px; margin-bottom:0; font-size:30px;font-weight:normal; }
 				.identity-plus-main-fm-header h5{padding-left:50px; font-size:14px; font-weight:300; padding-bottom:0px; padding-top:0; margin:10px 0px 0px 0px;}
-				h5.identity-plus-title {font-weight:300; font-size:16px; line-height:130%; margin:0; max-width:640px; color:#909090;}
+				h5.identity-plus-title {font-weight:300; font-size:16px; line-height:130%; margin:0; max-width:640px; color:#707070;}
 				.identity-plus-main-fm p{margin:0;}
 				.identity-plus-main-fm th{padding-bottom:15px; padding-top:15px; color:#136a92;}
 				.identity-plus-main-fm td{padding-bottom:10px; padding-top:10px; }
@@ -111,7 +111,7 @@ function identity_plus_admin_styles(  ) {
 				.identity-plus-main-fm .cert p{margin:0px; float:left; clear:left;}
 				.identity-plus-main-fm .cert {padding:10px; background:rgba(255, 255, 255, 0.6); border:1px solid rgba(0, 0, 0, 0.3);}
 				.identity-plus-separator{border-top:1px solid #72777c; margin-top:0px; float:left; width:100%; clear:both; height:5px; margin-bottom:0px;}
-				.identity-plus-hint{float:left; clear:both; max-width:600px; color:#909090; font-size:12px; margin-top:0px; margin-bottom:10px;}
+				.identity-plus-main-fm p.identity-plus-hint, .identity-plus-hint{float:left; clear:both; max-width:600px; color:#909090; font-size:12px; margin-top:0px; margin-bottom:10px;}
                 .identity-plus-brand span{color:#4292D3; margin-left:0.1em;}
                 .identity-plus-main-fm input, .identity-plus-main-fm textarea{ float:left; clear:left;}
                 .identity-plus-main-fm input[type="checkbox"]{ margin-top:0; margin-right:5px;}
@@ -131,7 +131,7 @@ function identity_plus_admin_styles(  ) {
 				.identity-plus-main-fm input[type=text]{padding:5px; box-shadow:none;}
 				.identity-plus-main-fm textarea{margin:0px 10px 5px 0px; float:left; clear:left; margin-bottom:20px; border-radius:1px; border:1px solid #72777c; box-shadow:none; padding:5px 10px; background:rgba(0,0,0,0.05); font-family:monospace;}
 				.identity-plus-main-fm textarea:focus{box-shadow:none;}
-				.identity-plus-main-fm .submit{float:left; clear:left; margin-top:0px; padding:0px; height:32px;}
+				.identity-plus-main-fm .submit{float:left; clear:left; margin-top:0px; padding:0px;}
 				.identity-plus-main-fm .submit input[type="submit"]{text-decoration:none; background:#4292D3; color:#FFFFFF; display:inline-block; border-radius:1px; border:1px solid rgba(0,0,0,0.1); cursor:pointer; box-shadow:none; text-shadow:none; font-size:14px; padding:3px 18px; height:auto;}
 				.identity-plus-main-fm a.submit{text-decoration:none; background:#4292D3; color:#FFFFFF; display:inline-block; border-radius:1px; border:1px solid rgba(0,0,0,0.1); cursor:pointer; box-shadow:none; text-shadow:none; font-size:14px; padding:8px 18px 6px 18px; height:auto;}
 				.wp-core-ui .notice.is-dismissible{margin-left:0;}
@@ -139,35 +139,28 @@ function identity_plus_admin_styles(  ) {
 		<?php 
 }
 
-function settings_header(){ ?>
-	<table><tr>
-			<td><h5 class="identity-plus-title">
-				Authenticate with your device and prevent unknown and malicious devices from accessing your Wordpress account. Great security at great convenience.
-			</h5></td>
-	</tr></table>
-<?php }
-
 function identity_plus_api_section_callback(  ) {
 	$problems = idp_problems(get_option( 'identity_plus_settings' ));
 
-	settings_header();
-
 	?>
 	
-	<div class="identity-plus-main-fm" >
-		<h2>Service Identity</h2>
-		<p class="identity-plus-separator" style="padding-top:5px;"></p>
-		<p class="identity-plus-hint">Your Worpress uses PKI credentials to authenticate into Indentity Plus. This is necessary to make sure nobody impersonates your service.</p>
-	</div>
-	<div class="identity-plus-main-fm" >
-	<table class=""><tr>
-
 	<?php
 	
 	if(!$problems){
 		// display dial for certificate lifetime
 		// and expiry
 		?>
+		<h5 class="identity-plus-title">
+			Authenticate with your device and prevent unknown and malicious devices from accessing your Wordpress account. Great security at great convenience.
+		</h5>
+
+		<div class="identity-plus-main-fm" >
+			<h2>Service Identity</h2>
+			<p class="identity-plus-separator" style="padding-top:5px;"></p>
+			<p class="identity-plus-hint" style="margin-bottom:5px;">Your Worpress uses PKI credentials to authenticate into Indentity Plus. This is necessary to make sure nobody impersonates your service.</p>
+		</div>
+		<div class="identity-plus-main-fm" >
+		<table class=""><tr>
 		<td valign="top"><div class="holder-more"><?php
 			$perimeter = 2*3.14*60;
 			$options = get_option( 'identity_plus_settings' );
@@ -192,13 +185,23 @@ function identity_plus_api_section_callback(  ) {
 		</div><?php
 		?></div>
 		</td>
+	<?php } else { ?>
+		<h5 class="identity-plus-title">
+			Thank you for installing Identity Plus!	There is one more thing to do beofre you can enjoy more security with less headache.
+		</h5>
+
+		<div class="identity-plus-main-fm" >
+			<h2>Service Registration</h2>
+			<p class="identity-plus-separator" style="padding-top:5px;"></p>
+			<p class="identity-plus-hint">Your Worpress uses PKI credentials to authenticate into Indentity Plus. This is necessary to make sure nobody impersonates your service.</p>
+		</div>
 	<?php } ?>
 
-	<td valign="top"><div class="identity-plus-main-fm">
+	<td valign="top"><div class="identity-plus-main-fm" style="margin-bottom:5px;">
 		<script>
 			function toggle_renewal(mode){
-				document.getElementById('renew-fm').className = mode == 0 ? 'identity-plus-hint' : 'nodisp'; 
-				document.getElementById('upload-fm').className = mode == 0 ? 'nodisp' : 'identity-plus-hint';
+				document.getElementById('renew-fm').className = mode == 0 ? 'identity-plus-main-fm' : 'nodisp'; 
+				document.getElementById('upload-fm').className = mode == 0 ? 'nodisp' : 'identity-plus-main-fm';
 				document.getElementById('integrated').className = mode == 0 ? 'toggle-on' : 'toggle-off'; 
 				document.getElementById('manual').className = mode == 0 ? 'toggle-off' : 'toggle-on';
 			}
@@ -211,15 +214,15 @@ function identity_plus_api_section_callback(  ) {
 		<form id="renew-fm" class="identity-plus-main-fm" action="admin-post.php" method='post' enctype="multipart/form-data">
 				<input type="hidden" name="action" value="certify_ownership">
 				<div>
-					<p class="identity-plus-hint" style="font-size:13px; margin-bottom:5px;">Click the button below to add certify your ownership of this Wordpress instance.</p>
-					<?php submit_button("Certify Ownership"); ?>
+					<p class="identity-plus-hint" style="font-size:13px; margin-top:5px; ">Click the button below to add certify your ownership and connect this site with your Identity Plus account.</p>
+					<?php submit_button("Register Site"); ?>
 				</div>
 		</form>
 	<?php } else { ?>
 		<form id="renew-fm" class="identity-plus-main-fm" action="admin-post.php" method='post' enctype="multipart/form-data">
 				<input type="hidden" name="action" value="renew_certificate">
 				<div>
-					<p class="identity-plus-hint" style="font-size:13px; margin-bottom:5px;">To avoid outage, your service identity (certificate) will be renewed automatically in <?php echo floor($days - $all_days/3); ?> days.</p>
+					<p class="identity-plus-hint" style="font-size:13px; margin-top:5px;">To avoid outage, your service identity (certificate) will be renewed automatically in <?php echo floor($days - $all_days/3); ?> days.</p>
 					<?php submit_button("Auto-Renew Now"); ?>
 				</div>
 		</form>
@@ -228,7 +231,7 @@ function identity_plus_api_section_callback(  ) {
 	<form id="upload-fm" class="nodisp" action="admin-post.php" method='post' enctype="multipart/form-data">
 			<input type="hidden" name="action" value="upload_certificate">
 			<div>
-				<p class="identity-plus-hint" style="font-size:13px;">Create the service in your <a href="https://my.identity.plus" target="_blank">identityp.plus dashboard</a>, issue the Service Agent Identity and upload it manually.</p>
+				<p class="identity-plus-hint" style="font-size:13px; margin-bottom:5px; margin-top:5px;">Create the service in your <a href="https://my.identity.plus" target="_blank">identityp.plus dashboard</a>, issue the Service Agent Identity and upload it manually.</p>
 				<?php identity_plus_cert_file_render(); ?>
 				<?php identity_plus_cert_password_render(); ?>
 				<?php submit_button("Upload Manually"); ?>
@@ -240,11 +243,9 @@ function identity_plus_api_section_callback(  ) {
 		// add the access restriction configuration section
 		// and also the network of trust enrollment
 		?>
-		<div class="identity-plus-main-fm" >
-			<h2>Access Restrictions</h2>
-			<p class="identity-plus-separator" style="padding-top:5px;"></p><p class="identity-plus-hint">You can restrict access to critical sections of your site to authorized devices only. Add one resource pattern per line.</p>
-		</div>
 		<form id="upload-fm" class="identity-plus-main-fm" action="admin-post.php" method='post' enctype="multipart/form-data">
+				<h2>Access Restrictions</h2>
+				<p class="identity-plus-separator" style="padding-top:5px;"></p><p class="identity-plus-hint">You can restrict access to critical sections of your site to authorized devices only. Add one resource pattern per line.</p>
 				<input type="hidden" name="action" value="save_access">
 				<div>
 					<?php identity_plus_page_filter_render(); ?>
@@ -253,11 +254,9 @@ function identity_plus_api_section_callback(  ) {
 				</div>
 		</form>
 
-		<div class="identity-plus-main-fm" >
-			<h2>Network of Trust</h2>
-			<p class="identity-plus-separator" style="padding-top:5px;"></p><p class="identity-plus-hint">Collaborate with the Identity Plus community to better identify legitimate users using anonymized hooks (no personal information is shared). This will help eliminate SPAM and fake accounts.</p>
-		</div>
 		<form id="upload-fm" class="identity-plus-main-fm" action="admin-post.php" method='post' enctype="multipart/form-data">
+				<h2>Network of Trust</h2>
+				<p class="identity-plus-separator" style="padding-top:5px;"></p><p class="identity-plus-hint">Collaborate with the Identity Plus community to better identify legitimate users using anonymized hooks (no personal information is shared). This will help eliminate SPAM and fake accounts.</p>
 				<input type="hidden" name="action" value="not_enroll">
 				<div>
 					<?php submit_button(isset($options['not_enroll']) && $options['not_enroll'] == 1 ? "Disable" : "Enroll"); ?>
@@ -302,7 +301,7 @@ function identity_plus_options_page(  ) {
 		?>
 		<div class="identity-plus-main-fm-header">
 			<h1 class="identity-plus-brand">identity<span>plus</span></h1>
-			<h5>authenticate everything</h5>
+			<h5>we build on trust</h5>
 		</div>
 		
 		<?php 
@@ -354,7 +353,7 @@ function identity_plus_admin_certify_ownership(){
 	if($identity_plus_api == null) $identity_plus_api = identity_plus_create_api($options);
 	$intent_ref = $identity_plus_api->issue_register_intent();
 
-	error_log("intent----->".$intent_ref->value);
+	// error_log("intent----->".$intent_ref->value);
 
 	// store the challenge in the database so we can serve it later
 	$options['registeration-reference'] = $intent_ref->value;
@@ -488,7 +487,7 @@ function identity_plus_authentication_page(  ) {
 		?>
 		<div class="identity-plus-main-fm-header">
 			<h1 class="identity-plus-brand">identity<span>plus</span></h1>
-			<h5>authenticate everything</h5>
+			<h5>we build on trust</h5>
 		</div>
 		<form class="identity-plus-main-fm" method="post" action="<?php echo admin_url( 'admin.php' ); ?>">
                 <?php wp_nonce_field('my_delete_action'); ?>

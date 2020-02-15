@@ -4,9 +4,9 @@
    Plugin Name: Identity Plus 
    Plugin URI: https://wordpress.org/plugins/identity-plus
    Description: Connect your WordPress with Identity Plus and enable invisible 2 factor authentication, secured SSO, SSL Client Certificate based access on select pages and join the Identity Plus network of trust where devices and people are anonymousely rated based on how they behave. 
-   Version: 2.1
+   Version: 2.2
    Author: Identity Plus Inc.
-   Author URI: http://identity.plus
+   Author URI: https://identity.plus
    License: GPL2
 */
 
